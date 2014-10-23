@@ -76,6 +76,7 @@
     <module>cloudsigma2-wdc</module>
     <module>cloudsigma2-zrh</module>
     <module>digitalocean</module>
+    <module>digitalocean2</module>
     <module>joyent-cloudapi</module>
     <module>joyentcloud</module>
     <module>abiquo</module>
