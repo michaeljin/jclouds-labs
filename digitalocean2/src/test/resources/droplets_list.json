@@ -1,155 +1,74 @@
 {
     "droplets": [
         {
-            "id": 19,
-            "name": "test.example.com",
+            "id": 2987383,
+            "name": "test1",
             "memory": 512,
             "vcpus": 1,
             "disk": 20,
-            "region": {
-                "slug": "nyc1",
-                "name": "New York",
-                "sizes": [
-                    "1gb",
-                    "512mb"
+            "locked": true,
+            "status": "new",
+            "kernel": {
+                "id": 1682,
+                "name": "Ubuntu 14.04 x64 vmlinuz-3.13.0-32-generic",
+                "version": "3.13.0-32-generic"
+            },
+            "created_at": "2014-10-27T19:56:12Z",
+            "features": [
+                "virtio"
+            ],
+            "backup_ids": [],
+            "snapshot_ids": [],
+            "image": {
+                "id": 6918990,
+                "name": "14.04 x64",
+                "distribution": "Ubuntu",
+                "slug": "ubuntu-14-04-x64",
+                "public": true,
+                "regions": [
+                    "nyc1",
+                    "ams1",
+                    "sfo1",
+                    "nyc2",
+                    "ams2",
+                    "sgp1",
+                    "lon1",
+                    "nyc3",
+                    "ams3",
+                    "nyc3"
                 ],
-                "available": true,
+                "created_at": "2014-10-17T20:24:33Z",
+                "min_size": "512mb"
+            },
+            "size_slug": "512mb",
+            "networks": {
+                "v4": [
+                    {
+                        "ip_address": "104.131.191.15",
+                        "netmask": "255.255.240.0",
+                        "gateway": "104.131.176.1",
+                        "type": "public"
+                    }
+                ],
+                "v6": []
+            },
+            "region": {
+                "name": "New York 3",
+                "slug": "nyc3",
+                "sizes": [],
                 "features": [
                     "virtio",
                     "private_networking",
                     "backups",
-                    "ipv6"
-                ]
-            },
-            "image": {
-                "id": 119192817,
-                "name": "Ubuntu 13.04",
-                "distribution": "ubuntu",
-                "slug": "ubuntu1304",
-                "public": true,
-                "regions": [
-                    "nyc1"
+                    "ipv6",
+                    "metadata"
                 ],
-                "created_at": "2014-09-05T02:02:05Z"
-            },
-            "size": {
-                "slug": "512mb",
-                "transfer": 1,
-                "price_monthly": 5.0,
-                "price_hourly": 0.00744
-            },
-            "locked": false,
-            "status": "active",
-            "networks": {
-                "v4": [
-                    {
-                        "ip_address": "127.0.0.19",
-                        "netmask": "255.255.255.0",
-                        "gateway": "127.0.0.20",
-                        "type": "public"
-                    }
-                ],
-                "v6": [
-                    {
-                        "ip_address": "2001::13",
-                        "cidr": 124,
-                        "gateway": "2400:6180:0000:00D0:0000:0000:0009:7000",
-                        "type": "public"
-                    }
-                ]
-            },
-            "kernel": {
-                "id": 485432985,
-                "name": "DO-recovery-static-fsck",
-                "version": "3.8.0-25-generic"
-            },
-            "created_at": "2014-09-05T02:02:05Z",
-            "features": [
-                "ipv6"
-            ],
-            "backup_ids": [
-                124124
-            ],
-            "snapshot_ids": [
-                12131
-            ]
-        },
-        {
-            "id": 20,
-            "name": "test.example.com",
-            "memory": 512,
-            "vcpus": 1,
-            "disk": 20,
-            "region": {
-                "slug": "nyc1",
-                "name": "New York",
-                "sizes": [
-                    "1gb",
-                    "512mb"
-                ],
-                "available": true,
-                "features": [
-                    "virtio",
-                    "private_networking",
-                    "backups",
-                    "ipv6"
-                ]
-            },
-            "image": {
-                "id": 119192817,
-                "name": "Ubuntu 13.04",
-                "distribution": "ubuntu",
-                "slug": "ubuntu1304",
-                "public": true,
-                "regions": [
-                    "nyc1"
-                ],
-                "created_at": "2014-09-05T02:02:05Z"
-            },
-            "size": {
-                "slug": "512mb",
-                "transfer": 1,
-                "price_monthly": 5.0,
-                "price_hourly": 0.00744
-            },
-            "locked": false,
-            "status": "active",
-            "networks": {
-                "v4": [
-                    {
-                        "ip_address": "127.0.0.19",
-                        "netmask": "255.255.255.0",
-                        "gateway": "127.0.0.20",
-                        "type": "public"
-                    }
-                ],
-                "v6": [
-                    {
-                        "ip_address": "2001::13",
-                        "cidr": 124,
-                        "gateway": "2400:6180:0000:00D0:0000:0000:0009:7000",
-                        "type": "public"
-                    }
-                ]
-            },
-            "kernel": {
-                "id": 485432985,
-                "name": "DO-recovery-static-fsck",
-                "version": "3.8.0-25-generic"
-            },
-            "created_at": "2014-09-05T02:02:05Z",
-            "features": [
-                "ipv6"
-            ],
-            "backup_ids": [
-
-            ],
-            "snapshot_ids": [
-
-            ]
+                "available": null
+            }
         }
     ],
+    "links": {},
     "meta": {
-        "total": 2
+        "total": 1
     }
 }

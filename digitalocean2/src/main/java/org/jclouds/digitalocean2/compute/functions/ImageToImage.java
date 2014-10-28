@@ -45,7 +45,7 @@ public class ImageToImage implements Function<Image, org.jclouds.compute.domain.
 
       OperatingSystem os = input.getOs();
 
-      builder.operatingSystem(builder() 
+      builder.operatingSystem(builder()
             .name(input.getName()) 
             .family(os.getDistribution().getOsFamily()) 
             .description(input.getName()) 
