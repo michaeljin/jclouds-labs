@@ -65,23 +65,21 @@
   </repositories>
 
   <modules>
-    <module>azurecompute</module>
-    <module>docker</module>
-    <module>cdmi</module>
-    <module>cloudsigma2</module>
-    <module>cloudsigma2-hnl</module>
-    <module>cloudsigma2-lvs</module>
-    <module>cloudsigma2-sjc</module>
-    <module>cloudsigma2-wdc</module>
-    <module>cloudsigma2-zrh</module>
-    <module>digitalocean</module>
     <module>digitalocean2</module>
-    <module>joyent-cloudapi</module>
-    <module>joyentcloud</module>
-    <module>abiquo</module>
-    <module>profitbricks</module>
-    <module>shipyard</module>
   </modules>
+
+  <distributionManagement>
+      <repository>
+          <id>third-party-patch</id>
+          <name>Third Party Patch</name>
+          <url>http://nexus.msphere.co/nexus/content/repositories/third-party-patch/</url>
+      </repository>
+      <snapshotRepository>
+          <id>third-party-patch</id>
+          <name>Third Party Patch</name>
+          <url>http://nexus.msphere.co/nexus/content/repositories/third-party-patch/</url>
+      </snapshotRepository>
+  </distributionManagement>
 
   <build>
     <plugins>
