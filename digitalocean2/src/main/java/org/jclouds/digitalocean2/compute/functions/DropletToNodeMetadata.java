@@ -36,6 +36,7 @@ import org.jclouds.compute.domain.NodeMetadataBuilder;
 import org.jclouds.compute.functions.GroupNamingConvention;
 import org.jclouds.compute.reference.ComputeServiceConstants;
 import org.jclouds.digitalocean2.domain.Droplet;
+import org.jclouds.digitalocean2.domain.Network;
 import org.jclouds.domain.Credentials;
 import org.jclouds.domain.Location;
 import org.jclouds.domain.LoginCredentials;
@@ -44,6 +45,8 @@ import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 import com.google.common.base.Supplier;
+import com.google.common.collect.FluentIterable;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 
 /**
@@ -85,8 +88,8 @@ public class DropletToNodeMetadata implements Function<Droplet, NodeMetadata> {
       builder.hostname(input.getName());
       builder.group(groupNamingConvention.extractGroup(input.getName()));
 
-//      builder.hardware(getHardware(input.getSize().getSlug()));
-//      builder.location(getLocation(input.getRegion().getSlug()));
+      builder.hardware(getHardware(input.getSize()));
+      builder.location(getLocation(input.getRegion().getSlug()));
 
       Optional<? extends Image> image = findImage(input.getImage().getId());
       if (image.isPresent()) {
@@ -101,10 +104,19 @@ public class DropletToNodeMetadata implements Function<Droplet, NodeMetadata> {
       builder.status(toPortableStatus.apply(input.getStatus()));
       builder.backendStatus(input.getStatus().name());
 
-/*    TODO: Map networks
-      if (input.getIp() != null) {
-         builder.publicAddresses(ImmutableSet.of(input.getIp()));
+//    TODO: Map networks
+      if (!input.getPublicAddresses().isEmpty()) {
+         builder.publicAddresses(FluentIterable
+                     .from(input.getPublicAddresses())
+                     .transform(new Function<Network.Address, String>() {
+                        @Override
+                        public String apply(final Network.Address input) {
+                           return input.getIp();
+                        }
+                     })
+         );
       }
+/*
       if (input.getPrivateIp() != null) {
          builder.privateAddresses(ImmutableSet.of(input.getPrivateIp()));
       }

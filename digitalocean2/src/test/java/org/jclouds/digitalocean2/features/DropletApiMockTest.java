@@ -16,7 +16,9 @@
  */
 package org.jclouds.digitalocean2.features;
 
+import static com.google.inject.internal.util.$ImmutableSet.of;
 import static org.jclouds.Constants.PROPERTY_MAX_RETRIES;
+import static org.jclouds.digitalocean2.compute.util.LocationNamingUtils.extractRegionId;
 import static org.jclouds.util.Strings2.toStringAndClose;
 import static org.testng.Assert.assertEquals;
 
@@ -26,15 +28,22 @@ import java.util.Set;
 import javax.ws.rs.core.HttpHeaders;
 
 import org.jclouds.ContextBuilder;
+import org.jclouds.compute.domain.NodeMetadataBuilder;
 import org.jclouds.digitalocean2.DigitalOcean2Api;
 import org.jclouds.digitalocean2.DigitalOcean2Constants;
 import org.jclouds.digitalocean2.domain.Droplet;
+import org.jclouds.digitalocean2.domain.DropletCreate;
+import org.jclouds.digitalocean2.domain.Network;
+import org.jclouds.digitalocean2.domain.options.CreateDropletOptions;
 import org.jclouds.http.BaseMockWebServerTest;
 import org.jclouds.http.config.JavaUrlHttpCommandExecutorServiceModule;
 import org.jclouds.oauth.v2.OAuthTestUtils;
 import org.testng.annotations.Test;
 import com.google.common.base.Charsets;
+import com.google.common.base.Function;
 import com.google.common.base.Throwables;
+import com.google.common.collect.FluentIterable;
+import com.google.common.collect.ImmutableSet;
 import com.google.inject.Module;
 import com.squareup.okhttp.mockwebserver.MockResponse;
 import com.squareup.okhttp.mockwebserver.MockWebServer;
@@ -54,7 +63,22 @@ public class DropletApiMockTest extends BaseMockWebServerTest {
       try {
          DropletApi dropletApi = api.getDropletApi();
          Set<Droplet> droplets = dropletApi.listDroplets();
-         assertEquals(droplets.size(), 2);
+         assertEquals(droplets.size(), 1);
+
+         Droplet droplet = droplets.iterator().next();
+         NodeMetadataBuilder builder = new NodeMetadataBuilder();
+
+         if (!droplet.getPublicAddresses().isEmpty()) {
+            builder.publicAddresses(FluentIterable
+                        .from(droplet.getPublicAddresses())
+                        .transform(new Function<Network.Address, String>() {
+                           @Override
+                           public String apply(final Network.Address input) {
+                              return input.getIp();
+                           }
+                        })
+            );
+         }
 
          RecordedRequest request = server.takeRequest();
          assertAuthentication(request);
@@ -66,6 +90,38 @@ public class DropletApiMockTest extends BaseMockWebServerTest {
       }
    }
 
+   public void testCreateDroplets() throws IOException, InterruptedException {
+      MockWebServer server = mockWebServer(new MockResponse()
+            .setBody(payloadFromResource("/droplet_create_res.json")));
+      DigitalOcean2Api api = api(server.getUrl("/").toString());
+
+      try {
+         CreateDropletOptions.Builder options = CreateDropletOptions.builder();
+         options.addSshKeyIds(ImmutableSet.of(421192));
+         options.privateNetworking(false);
+         options.backupsEnabled(false);
+
+         // Find the location where the Droplet has to be created
+         String region = "sfo1";
+
+         //      DropletCreation dropletCreation = api.getDropletApi().create(name,
+         DropletCreate dropletCreated = api.getDropletApi().create("digitalocean2-s-d5e",
+               region,
+               "512mb",
+               "6374124",
+               options.build());
+
+         assertEquals(dropletCreated.getDroplet().getName(), "digitalocean2-s-d5e");
+
+         RecordedRequest request = server.takeRequest();
+         assertAuthentication(request);
+         assertEquals(request.getRequestLine(),
+               String.format("POST /droplets HTTP/1.1", server.getUrl("/").toString()));
+      } finally {
+         api.close();
+         server.shutdown();
+      }
+   }
 
    private static void assertAuthentication(final RecordedRequest request) throws InterruptedException {
       assertEquals(request.getHeader(HttpHeaders.AUTHORIZATION), "Bearer c5401990f0c24135e8d6b5d260603fc71696d4738da9aa04a720229a01a2521d");

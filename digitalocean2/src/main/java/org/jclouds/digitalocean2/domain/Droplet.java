@@ -17,14 +17,20 @@
 package org.jclouds.digitalocean2.domain;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.collect.Iterables.filter;
 
 import java.beans.ConstructorProperties;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
 import javax.inject.Named;
 
+import org.jclouds.compute.predicates.ImagePredicates;
+import org.jclouds.javax.annotation.Nullable;
 import com.google.common.base.Enums;
 import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
+import com.google.common.collect.FluentIterable;
 
 /**
  * A droplet.
@@ -48,11 +54,13 @@ public class Droplet {
    private final Region region;
    private final Image image;
    private final Kernel kernel;
-   private final Size size;
+   @Named("size_slug")
+   private final String size;
    private final boolean locked;
    private final String created_at;
    private final Status status;
-   private final Object networks;
+   @Named("networks")
+   private final Network network;
    @Named("backup_ids")
    private final int[] backups;
    @Named("snapshot_ids")
@@ -60,11 +68,10 @@ public class Droplet {
    private final String[] features;
 
    @ConstructorProperties({ "id", "name", "memory", "vcpus", "disk", "region", "image", "kernel",
-         "size", "locked", "created_at", "status", "networks", "backup_ids", "snapshot_ids", "features" })
+         "size_slug", "locked", "created_at", "status", "networks", "backup_ids", "snapshot_ids", "features" })
    public Droplet(int id, String name, int memory, int vcpus, int disk, Region region, Image image,
-         Kernel kernel, Size size, boolean locked, String created_at, Status status, Object networks,
-         int[] backups,
-         int[] snapshots, String[] features) {
+         Kernel kernel, String size, boolean locked, String created_at, Status status, Network network,
+         int[] backups, int[] snapshots, String[] features) {
       this.id = id;
       this.name = name;
       this.memory = memory;
@@ -77,7 +84,7 @@ public class Droplet {
       this.locked = locked;
       this.created_at = created_at;
       this.status = status;
-      this.networks = networks;
+      this.network = network;
       this.backups = backups;
       this.snapshots = snapshots;
       this.features = features;
@@ -116,7 +123,7 @@ public class Droplet {
       return kernel;
    }
 
-   public Size getSize() {
+   public String getSize() {
       return size;
    }
 
@@ -132,8 +139,8 @@ public class Droplet {
       return status;
    }
 
-   public Object getNetworks() {
-      return networks;
+   public Network getNetwork() {
+      return network;
    }
 
    public int[] getBackups() {
@@ -162,10 +169,19 @@ public class Droplet {
             ", locked=" + locked +
             ", created_at='" + created_at + '\'' +
             ", status='" + status + '\'' +
-            ", networks=" + networks +
+            ", network=" + network +
             ", backups=" + Arrays.toString(backups) +
             ", snapshots=" + Arrays.toString(snapshots) +
             ", features=" + Arrays.toString(features) +
             '}';
+   }
+
+   public Set<Network.Address> getPublicAddresses() {
+      return FluentIterable
+            .from(network.getIpv4Networks())
+            .append(network.getIpv6Networks())
+//            .from(network.getIpv6Networks())
+            .filter(Network.Predicates.publicNetworks())
+            .toSet();
    }
 }
