@@ -27,7 +27,6 @@ import org.jclouds.http.HttpRequest;
 import org.jclouds.javax.annotation.Nullable;
 import org.jclouds.rest.MapBinder;
 import org.jclouds.rest.binders.BindToJsonPayload;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
 /**

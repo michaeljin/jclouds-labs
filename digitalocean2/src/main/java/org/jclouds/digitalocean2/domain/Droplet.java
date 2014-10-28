@@ -17,20 +17,17 @@
 package org.jclouds.digitalocean2.domain;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.collect.Iterables.filter;
 
 import java.beans.ConstructorProperties;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Set;
 import javax.inject.Named;
 
-import org.jclouds.compute.predicates.ImagePredicates;
-import org.jclouds.javax.annotation.Nullable;
 import com.google.common.base.Enums;
 import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
 import com.google.common.collect.FluentIterable;
+import com.google.common.collect.ImmutableSet;
 
 /**
  * A droplet.
@@ -177,10 +174,11 @@ public class Droplet {
    }
 
    public Set<Network.Address> getPublicAddresses() {
+      ImmutableSet.Builder<Network.Address> addressBuilder = new ImmutableSet.Builder<Network.Address>();
+      addressBuilder.addAll(network.getIpv4Networks())
+            .addAll(network.getIpv6Networks());
       return FluentIterable
-            .from(network.getIpv4Networks())
-            .append(network.getIpv6Networks())
-//            .from(network.getIpv6Networks())
+            .from(addressBuilder.build())
             .filter(Network.Predicates.publicNetworks())
             .toSet();
    }

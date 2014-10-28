@@ -16,9 +16,7 @@
  */
 package org.jclouds.digitalocean2.features;
 
-import static com.google.inject.internal.util.$ImmutableSet.of;
 import static org.jclouds.Constants.PROPERTY_MAX_RETRIES;
-import static org.jclouds.digitalocean2.compute.util.LocationNamingUtils.extractRegionId;
 import static org.jclouds.util.Strings2.toStringAndClose;
 import static org.testng.Assert.assertEquals;
 
