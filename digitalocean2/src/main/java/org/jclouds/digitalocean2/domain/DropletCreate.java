@@ -17,7 +17,6 @@
 package org.jclouds.digitalocean2.domain;
 
 import java.beans.ConstructorProperties;
-import java.util.List;
 
 public class DropletCreate {
    private final Droplet droplet;
