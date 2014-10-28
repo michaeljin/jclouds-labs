@@ -16,6 +16,7 @@
  */
 package org.jclouds.digitalocean2.compute.config;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static org.jclouds.compute.config.ComputeServiceProperties.TIMEOUT_IMAGE_AVAILABLE;
 import static org.jclouds.compute.config.ComputeServiceProperties.TIMEOUT_NODE_RUNNING;
 import static org.jclouds.compute.config.ComputeServiceProperties.TIMEOUT_NODE_SUSPENDED;
@@ -48,6 +49,7 @@ import org.jclouds.digitalocean2.compute.strategy.CreateKeyPairsThenCreateNodes;
 import org.jclouds.digitalocean2.compute.strategy.DigitalOceanComputeServiceAdapter;
 import org.jclouds.digitalocean2.domain.Action;
 import org.jclouds.digitalocean2.domain.Droplet;
+import org.jclouds.digitalocean2.domain.DropletCreate;
 import org.jclouds.digitalocean2.domain.Image;
 import org.jclouds.digitalocean2.domain.Region;
 import org.jclouds.digitalocean2.domain.Size;
@@ -104,9 +106,9 @@ public class DigitalOceanComputeServiceContextModule extends
    @Provides
    @Singleton
    @Named(TIMEOUT_NODE_RUNNING)
-   protected Predicate<Action> provideDropletRunningPredicate(final DigitalOcean2Api api, Timeouts timeouts,
+   protected Predicate<DropletCreate.Action> provideDropletRunningPredicate(final DigitalOcean2Api api, Timeouts timeouts,
          PollPeriod pollPeriod) {
-      return Predicates2.retry(new ActionDonePredicate(), timeouts.nodeRunning, pollPeriod.pollInitialPeriod,
+      return Predicates2.retry(new DropletCreatedPredicate(api), timeouts.nodeRunning, pollPeriod.pollInitialPeriod,
             pollPeriod.pollMaxPeriod);
    }
 
@@ -115,7 +117,7 @@ public class DigitalOceanComputeServiceContextModule extends
    @Named(TIMEOUT_NODE_SUSPENDED)
    protected Predicate<Action> provideDropletSuspendedPredicate(final DigitalOcean2Api api, Timeouts timeouts,
          PollPeriod pollPeriod) {
-      return Predicates2.retry(new ActionDonePredicate(), timeouts.nodeSuspended, pollPeriod.pollInitialPeriod,
+      return Predicates2.retry(new ActionDonePredicate(api), timeouts.nodeSuspended, pollPeriod.pollInitialPeriod,
             pollPeriod.pollMaxPeriod);
    }
 
@@ -124,7 +126,7 @@ public class DigitalOceanComputeServiceContextModule extends
    @Named(TIMEOUT_NODE_TERMINATED)
    protected Predicate<Action> provideDropletTerminatedPredicate(final DigitalOcean2Api api, Timeouts timeouts,
          PollPeriod pollPeriod) {
-      return Predicates2.retry(new ActionDonePredicate(), timeouts.nodeTerminated, pollPeriod.pollInitialPeriod,
+      return Predicates2.retry(new ActionDonePredicate(api), timeouts.nodeTerminated, pollPeriod.pollInitialPeriod,
             pollPeriod.pollMaxPeriod);
    }
 
@@ -133,7 +135,7 @@ public class DigitalOceanComputeServiceContextModule extends
    @Named(TIMEOUT_IMAGE_AVAILABLE)
    protected Predicate<Action> provideImageAvailablePredicate(final DigitalOcean2Api api, Timeouts timeouts,
          PollPeriod pollPeriod) {
-      return Predicates2.retry(new ActionDonePredicate(), timeouts.imageAvailable, pollPeriod.pollInitialPeriod,
+      return Predicates2.retry(new ActionDonePredicate(api), timeouts.imageAvailable, pollPeriod.pollInitialPeriod,
             pollPeriod.pollMaxPeriod);
    }
 
@@ -148,15 +150,16 @@ public class DigitalOceanComputeServiceContextModule extends
    @VisibleForTesting
    static class ActionDonePredicate implements Predicate<Action> {
 
-//      private final DigitalOcean2Api api;
+      private final DigitalOcean2Api api;
 
-//      public ActionDonePredicate(DigitalOcean2Api api) {
-//         this.api = checkNotNull(api, "api must not be null");
-//      }
+      public ActionDonePredicate(DigitalOcean2Api api) {
+         this.api = checkNotNull(api, "api must not be null");
+      }
 
       @Override
       public boolean apply(Action input) {
-         switch (input.getStatus()) {
+         Action updated = api.getActionApi().getAction(input.getId());
+         switch (updated.getStatus()) {
             case COMPLETED:
                return true;
             case INPROGRESS:
@@ -164,6 +167,31 @@ public class DigitalOceanComputeServiceContextModule extends
             case ERROR:
             default:
                throw new IllegalStateException("Resource is in invalid status: " + input.getStatus().name());
+         }
+      }
+
+   }
+
+   @VisibleForTesting
+   static class DropletCreatedPredicate implements Predicate<DropletCreate.Action> {
+
+      private final DigitalOcean2Api api;
+
+      public DropletCreatedPredicate(DigitalOcean2Api api) {
+         this.api = checkNotNull(api, "api must not be null");
+      }
+
+      @Override
+      public boolean apply(DropletCreate.Action input) {
+         Action updated = api.getActionApi().getAction(input.getId());
+         switch (updated.getStatus()) {
+            case COMPLETED:
+               return true;
+            case INPROGRESS:
+               return false;
+            case ERROR:
+            default:
+               throw new IllegalStateException("Resource is in invalid status: " + updated.getStatus().name());
          }
       }
 

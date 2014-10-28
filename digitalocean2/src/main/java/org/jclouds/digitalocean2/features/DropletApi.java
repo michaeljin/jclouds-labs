@@ -34,6 +34,7 @@ import org.jclouds.Fallbacks.EmptyIterableWithMarkerOnNotFoundOr404;
 import org.jclouds.digitalocean2.domain.Action;
 import org.jclouds.digitalocean2.domain.Backup;
 import org.jclouds.digitalocean2.domain.Droplet;
+import org.jclouds.digitalocean2.domain.DropletCreate;
 import org.jclouds.digitalocean2.domain.Kernel;
 import org.jclouds.digitalocean2.domain.Snapshot;
 import org.jclouds.digitalocean2.domain.options.CreateDropletOptions;
@@ -103,9 +104,9 @@ public interface DropletApi extends Closeable {
    @Named("droplet:create")
    @POST
    @Produces(MediaType.APPLICATION_JSON)
-   @SelectJson("droplet")
-   @MapBinder(BindToJsonPayload.class)
-   Droplet create(@PayloadParam("name") String name, @PayloadParam("region") String region,
+//   @SelectJson("droplet")
+   @MapBinder(CreateDropletOptions.class)
+   DropletCreate create(@PayloadParam("name") String name, @PayloadParam("region") String region,
          @PayloadParam("size") String size, @PayloadParam("image") String image, CreateDropletOptions options);
 
    @Named("droplet:get")

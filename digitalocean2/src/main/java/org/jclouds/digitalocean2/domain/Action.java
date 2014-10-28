@@ -20,6 +20,7 @@ package org.jclouds.digitalocean2.domain;
 import static com.google.common.base.Preconditions.checkArgument;
 
 import java.beans.ConstructorProperties;
+import java.lang.reflect.Field;
 
 import com.google.common.base.Enums;
 import com.google.common.base.Joiner;
@@ -29,10 +30,14 @@ public class Action {
    public enum Status {
       COMPLETED, INPROGRESS("in-progress"), ERROR;
 
-      private String displayName;
-
-      Status(String displayName) {
-         this.displayName = displayName;
+      Status(final String displayName) {
+         try {
+            final Field nameField = this.getClass().getSuperclass().getDeclaredField("name");
+            nameField.setAccessible(true);
+            nameField.set(this, displayName);
+         } catch (Exception e) {
+            throw new RuntimeException(e);
+         }
       }
 
       Status() {

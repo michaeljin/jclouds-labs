@@ -35,6 +35,7 @@ import org.jclouds.digitalocean2.DigitalOcean2Api;
 import org.jclouds.digitalocean2.compute.options.DigitalOceanTemplateOptions;
 import org.jclouds.digitalocean2.domain.Action;
 import org.jclouds.digitalocean2.domain.Droplet;
+import org.jclouds.digitalocean2.domain.DropletCreate;
 import org.jclouds.digitalocean2.domain.Image;
 import org.jclouds.digitalocean2.domain.Region;
 import org.jclouds.digitalocean2.domain.Size;
@@ -54,12 +55,12 @@ public class DigitalOceanComputeServiceAdapter implements ComputeServiceAdapter<
    protected Logger logger = Logger.NULL;
 
    private final DigitalOcean2Api api;
-   private final Predicate<Action> nodeRunningPredicate;
+   private final Predicate<DropletCreate.Action> nodeRunningPredicate;
    private final Predicate<Action> nodeStoppedPredicate;
    private final Predicate<Action> nodeTerminatedPredicate;
 
    @Inject DigitalOceanComputeServiceAdapter(DigitalOcean2Api api,
-         @Named(TIMEOUT_NODE_RUNNING) Predicate<Action> nodeRunningPredicate,
+         @Named(TIMEOUT_NODE_RUNNING) Predicate<DropletCreate.Action> nodeRunningPredicate,
          @Named(TIMEOUT_NODE_SUSPENDED) Predicate<Action> nodeStoppedPredicate,
          @Named(TIMEOUT_NODE_TERMINATED) Predicate<Action> nodeTerminatedPredicate) {
       this.api = checkNotNull(api, "api cannot be null");
@@ -89,7 +90,7 @@ public class DigitalOceanComputeServiceAdapter implements ComputeServiceAdapter<
       String region = extractRegionId(template.getLocation());
 
 //      DropletCreation dropletCreation = api.getDropletApi().create(name,
-      Droplet droplet = api.getDropletApi().create(name,
+      DropletCreate dropletCreated = api.getDropletApi().create(name,
             region,
             template.getHardware().getProviderId(),
             template.getImage().getProviderId(),
@@ -97,8 +98,8 @@ public class DigitalOceanComputeServiceAdapter implements ComputeServiceAdapter<
 
       // We have to actively wait until the droplet has been provisioned until
       // we can build the entire Droplet object we want to return
-      nodeRunningPredicate.apply(dropletCreation.getEventId());
-      Droplet droplet = api.getDropletApi().get(dropletCreation.getId());
+      nodeRunningPredicate.apply(dropletCreated.getLinks().getActions()[0]); //.get(0));
+      Droplet droplet = api.getDropletApi().getDroplet(dropletCreated.getDroplet().getId());
 
       LoginCredentials defaultCredentials = LoginCredentials.builder().user("root")
             .privateKey(templateOptions.getLoginPrivateKey()).build();

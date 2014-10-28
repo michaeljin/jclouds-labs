@@ -38,6 +38,7 @@ public class Image {
    @Named("public")
    private final boolean ispublic;
    private final String[] regions;
+   @Named("created_at")
    private final String created_at;
    private final OperatingSystem os;
 
@@ -51,8 +52,11 @@ public class Image {
       this.ispublic = ispublic;
       this.regions = regions;
       this.created_at = created_at;
-      this.os = OperatingSystem.builder().from(name, checkNotNull(distribution, "distribution")).build();
-
+      if (name != null && distribution != null) {
+         this.os = OperatingSystem.builder().from(name, checkNotNull(distribution, "distribution")).build();
+      } else {
+         this.os = null;
+      }
    }
 
    public int getId() {
