@@ -115,11 +115,20 @@ public class DropletToNodeMetadata implements Function<Droplet, NodeMetadata> {
                      })
          );
       }
-/*
-      if (input.getPrivateIp() != null) {
-         builder.privateAddresses(ImmutableSet.of(input.getPrivateIp()));
+//      if (input.getPrivateIp() != null) {
+//         builder.privateAddresses(ImmutableSet.of(input.getPrivateIp()));
+//      }
+      if (!input.getPrivateAddresses().isEmpty()) {
+          builder.privateAddresses(FluentIterable
+                  .from(input.getPrivateAddresses())
+                  .transform(new Function<Network.Address, String>() {
+                      @Override
+                      public String apply(final Network.Address input) {
+                          return input.getIp();
+                      }
+                  })
+          );
       }
-*/
 
       // DigitalOcean does not provide a way to get the credentials.
       // Try to return them from the credential store

@@ -182,4 +182,14 @@ public class Droplet {
             .filter(Network.Predicates.publicNetworks())
             .toSet();
    }
+
+    public Set<Network.Address> getPrivateAddresses() {
+        ImmutableSet.Builder<Network.Address> addressBuilder = new ImmutableSet.Builder<Network.Address>();
+        addressBuilder.addAll(network.getIpv4Networks())
+                .addAll(network.getIpv6Networks());
+        return FluentIterable
+                .from(addressBuilder.build())
+                .filter(Network.Predicates.privateNetworks())
+                .toSet();
+    }
 }
