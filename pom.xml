@@ -43,6 +43,14 @@
 
   <repositories>
     <repository>
+        <id>third-party-patch</id>
+        <name>Third Party Patch</name>
+        <url>http://nexus.msphere.co/nexus/content/repositories/third-party-patch/</url>
+        <snapshots>
+            <enabled>true</enabled>
+        </snapshots>
+    </repository>
+    <repository>
       <id>apache-snapshots</id>
       <url>https://repository.apache.org/content/repositories/snapshots</url>
       <releases>
