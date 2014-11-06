@@ -186,9 +186,9 @@ public class CreateKeyPairsThenCreateNodes extends CreateNodesWithGroupEncodedIn
             logger.debug(">> not cleaning up auto-generated key pairs...");
             for (Integer sshKeyId : generatedSshKeyIds) {
                try {
-                  api.getKeyApi().deleteKey(sshKeyId);
+                  //api.getKeyApi().deleteKey(sshKeyId);
                } catch (Exception ex) {
-                  //logger.warn(">> could not delete key pair %s: %s", sshKeyId, ex.getMessage());
+                  logger.warn(">> could not delete key pair %s: %s", sshKeyId, ex.getMessage());
                }
             }
          }
