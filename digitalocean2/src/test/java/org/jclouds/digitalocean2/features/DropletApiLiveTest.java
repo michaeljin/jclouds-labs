@@ -48,7 +48,7 @@ public class DropletApiLiveTest extends BaseDigitalOcean2LiveTest {
    public void testListKernels() {
 
       Set<Droplet> droplets = api().listDroplets();
-      Set<Kernel> kernels = api().listKernels(droplets.iterator().next().getId());
+      Set<Kernel> kernels = api().listKernels(droplets.iterator().next().id());
       assertEquals(kernels.iterator().next().getName(), "DO-recovery-static-fsck");
    }
 
@@ -56,7 +56,7 @@ public class DropletApiLiveTest extends BaseDigitalOcean2LiveTest {
    public void testSnapshots() {
 
       Set<Droplet> droplets = api().listDroplets();
-      Set<Snapshot> snapshots = api().listSnapshots(droplets.iterator().next().getId());
+      Set<Snapshot> snapshots = api().listSnapshots(droplets.iterator().next().id());
       assertEquals(snapshots.iterator().next().getName(), "jclouds-test-snapshot");
    }
 
@@ -65,22 +65,22 @@ public class DropletApiLiveTest extends BaseDigitalOcean2LiveTest {
 
 //      Can't even find docs for this one
       Set<Droplet> droplets = api().listDroplets();
-      Set<Backup> backups = api().listBackups(droplets.iterator().next().getId());
+      Set<Backup> backups = api().listBackups(droplets.iterator().next().id());
 //      assertEquals(backups.iterator().next().getName(), "jclouds-test-snapshot");
    }
 
    @Test(groups = "live", dependsOnMethods = "testCreate")
    public void testActions() {
       Set<Droplet> droplets = api().listDroplets();
-      Set<Action> actions = api().listActions(droplets.iterator().next().getId());
+      Set<Action> actions = api().listActions(droplets.iterator().next().id());
       assertEquals(actions.iterator().next().getType(), "power_cycle");
    }
 
    @Test(groups = "live")
    public void testCreate() {
       Droplet droplet = api().create("test1", "nyc3", "512mb", "ubuntu-14-04-x64");
-      dropletId = droplet.getId();
-      droplet.getStatus();
+      dropletId = droplet.id();
+      droplet.status();
 
    }
 

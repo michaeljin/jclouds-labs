@@ -98,13 +98,13 @@ public class DigitalOceanComputeServiceAdapter implements ComputeServiceAdapter<
 
       // We have to actively wait until the droplet has been provisioned until
       // we can build the entire Droplet object we want to return
-      nodeRunningPredicate.apply(dropletCreated.getLinks().getActions()[0]); //.get(0));
-      Droplet droplet = api.getDropletApi().getDroplet(dropletCreated.getDroplet().getId());
+      nodeRunningPredicate.apply(dropletCreated.getLinks().getActions()[0]);
+      Droplet droplet = api.getDropletApi().getDroplet(dropletCreated.getDroplet().id());
 
       LoginCredentials defaultCredentials = LoginCredentials.builder().user("root")
             .privateKey(templateOptions.getLoginPrivateKey()).build();
 
-      return new NodeAndInitialCredentials<Droplet>(droplet, String.valueOf(droplet.getId()), defaultCredentials);
+      return new NodeAndInitialCredentials<Droplet>(droplet, String.valueOf(droplet.id()), defaultCredentials);
    }
 
    @Override
@@ -119,6 +119,7 @@ public class DigitalOceanComputeServiceAdapter implements ComputeServiceAdapter<
 
    @Override
    public Iterable<Region> listLocations() {
+      // DigitalOcean lists regions that are unavailable for droplet creation
       return filter(api.getRegionApi().listRegions(), new Predicate<Region>() {
          @Override
          public boolean apply(Region region) {
@@ -137,7 +138,7 @@ public class DigitalOceanComputeServiceAdapter implements ComputeServiceAdapter<
       return filter(listNodes(), new Predicate<Droplet>() {
          @Override
          public boolean apply(Droplet droplet) {
-            return contains(ids, String.valueOf(droplet.getId()));
+            return contains(ids, String.valueOf(droplet.id()));
          }
       });
    }
@@ -163,6 +164,8 @@ public class DigitalOceanComputeServiceAdapter implements ComputeServiceAdapter<
       //TODO: Need to check action
 //      nodeTerminatedPredicate.apply(event);
    }
+
+
 
    @Override
    public void rebootNode(String id) {

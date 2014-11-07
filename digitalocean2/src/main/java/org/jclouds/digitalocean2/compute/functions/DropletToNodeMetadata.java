@@ -82,26 +82,26 @@ public class DropletToNodeMetadata implements Function<Droplet, NodeMetadata> {
    @Override
    public NodeMetadata apply(Droplet input) {
       NodeMetadataBuilder builder = new NodeMetadataBuilder();
-      builder.ids(String.valueOf(input.getId()));
-      builder.name(input.getName());
-      builder.hostname(input.getName());
-      builder.group(groupNamingConvention.extractGroup(input.getName()));
+      builder.ids(String.valueOf(input.id()));
+      builder.name(input.name());
+      builder.hostname(input.name());
+      builder.group(groupNamingConvention.extractGroup(input.name()));
 
-      builder.hardware(getHardware(input.getSize()));
-      builder.location(getLocation(input.getRegion().getSlug()));
+      builder.hardware(getHardware(input.size()));
+      builder.location(getLocation(input.region().getSlug()));
 
-      Optional<? extends Image> image = findImage(input.getImage().getId());
+      Optional<? extends Image> image = findImage(input.image().getId());
       if (image.isPresent()) {
          builder.imageId(image.get().getId());
          builder.operatingSystem(image.get().getOperatingSystem());
       } else {
          logger.info(">> image with id %s for droplet %s was not found. "
                + "This might be because the image that was used to create the droplet has a new id.",
-               input.getImage().getId(), input.getId());
+               input.image().getId(), input.id());
       }
 
-      builder.status(toPortableStatus.apply(input.getStatus()));
-      builder.backendStatus(input.getStatus().name());
+      builder.status(toPortableStatus.apply(input.status()));
+      builder.backendStatus(input.status().name());
 
 //    TODO: Map networks
       if (!input.getPublicAddresses().isEmpty()) {
@@ -123,7 +123,7 @@ public class DropletToNodeMetadata implements Function<Droplet, NodeMetadata> {
 
       // DigitalOcean does not provide a way to get the credentials.
       // Try to return them from the credential store
-      Credentials credentials = credentialStore.get("node#" + input.getId());
+      Credentials credentials = credentialStore.get("node#" + input.id());
       if (credentials instanceof LoginCredentials) {
          builder.credentials(LoginCredentials.class.cast(credentials));
       }
