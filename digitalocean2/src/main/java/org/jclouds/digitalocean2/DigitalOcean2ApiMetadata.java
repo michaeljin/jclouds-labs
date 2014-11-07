@@ -25,22 +25,25 @@ import static org.jclouds.reflect.Reflection2.typeToken;
 import java.net.URI;
 import java.util.Properties;
 
+import org.jclouds.apis.ApiMetadata;
 import org.jclouds.compute.ComputeServiceContext;
 import org.jclouds.digitalocean2.compute.config.DigitalOceanComputeServiceContextModule;
 import org.jclouds.digitalocean2.config.DigitalOcean2HttpApiModule;
 import org.jclouds.digitalocean2.config.DigitalOceanParserModule;
-import org.jclouds.digitalocean2.config.OAuthModuleWithoutTypeAdapters;
 import org.jclouds.oauth.v2.OAuthConstants;
 import org.jclouds.oauth.v2.config.CredentialType;
 import org.jclouds.oauth.v2.config.OAuthAuthenticationModule;
+import org.jclouds.oauth.v2.config.OAuthModule;
 import org.jclouds.oauth.v2.config.OAuthProperties;
 import org.jclouds.rest.internal.BaseHttpApiMetadata;
+import com.google.auto.service.AutoService;
 import com.google.common.collect.ImmutableSet;
 import com.google.inject.Module;
 
 /**
  * Implementation of {@link ApiMetadata} for DigitalOcean v2 API
  */
+@AutoService(ApiMetadata.class)
 public class DigitalOcean2ApiMetadata extends BaseHttpApiMetadata<DigitalOcean2Api> {
 
    @Override
@@ -81,7 +84,7 @@ public class DigitalOcean2ApiMetadata extends BaseHttpApiMetadata<DigitalOcean2A
                  .defaultModules(ImmutableSet.<Class<? extends Module>>builder()
                        .add(DigitalOcean2HttpApiModule.class)
                        .add(OAuthAuthenticationModule.class)
-                       .add(OAuthModuleWithoutTypeAdapters.class)
+                       .add(OAuthModule.class)
                        .add(DigitalOceanParserModule.class)
                        .add(DigitalOceanComputeServiceContextModule.class)
                        .build());

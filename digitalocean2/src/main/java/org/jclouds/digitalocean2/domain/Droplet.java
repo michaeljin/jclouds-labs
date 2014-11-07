@@ -17,12 +17,13 @@
 package org.jclouds.digitalocean2.domain;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.collect.ImmutableList.copyOf;
 
-import java.beans.ConstructorProperties;
-import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
-import javax.inject.Named;
 
+import org.jclouds.json.SerializedNames;
+import com.google.auto.value.AutoValue;
 import com.google.common.base.Enums;
 import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
@@ -32,7 +33,8 @@ import com.google.common.collect.ImmutableSet;
 /**
  * A droplet.
  */
-public class Droplet {
+@AutoValue
+public abstract class Droplet {
    public enum Status {
       NEW, ACTIVE, ARCHIVE, OFF;
 
@@ -42,141 +44,38 @@ public class Droplet {
          return status.get();
       }
    }
+   public abstract int id();
+   public abstract String name();
+   public abstract int memory();
+   public abstract int vcpus();
+   public abstract int disk();
+   public abstract Region region();
+   public abstract Image image();
+   public abstract Kernel kernel();
+   public abstract String size();
+   public abstract boolean locked();
+   public abstract String created();
+   public abstract Status status();
+   public abstract Network network();
+   public abstract List<Integer> backups();
+   public abstract List<Integer> snapshots();
+   public abstract List<String> features();
 
-   private final int id;
-   private final String name;
-   private final int memory;
-   private final int vcpus;
-   private final int disk;
-   private final Region region;
-   private final Image image;
-   private final Kernel kernel;
-   @Named("size_slug")
-   private final String size;
-   private final boolean locked;
-   private final String created_at;
-   private final Status status;
-   @Named("networks")
-   private final Network network;
-   @Named("backup_ids")
-   private final int[] backups;
-   @Named("snapshot_ids")
-   private final int[] snapshots;
-   private final String[] features;
-
-   @ConstructorProperties({ "id", "name", "memory", "vcpus", "disk", "region", "image", "kernel",
+   @SerializedNames({ "id", "name", "memory", "vcpus", "disk", "region", "image", "kernel",
          "size_slug", "locked", "created_at", "status", "networks", "backup_ids", "snapshot_ids", "features" })
-   public Droplet(int id, String name, int memory, int vcpus, int disk, Region region, Image image,
-         Kernel kernel, String size, boolean locked, String created_at, Status status, Network network,
-         int[] backups, int[] snapshots, String[] features) {
-      this.id = id;
-      this.name = name;
-      this.memory = memory;
-      this.vcpus = vcpus;
-      this.disk = disk;
-      this.region = region;
-      this.image = image;
-      this.kernel = kernel;
-      this.size = size;
-      this.locked = locked;
-      this.created_at = created_at;
-      this.status = status;
-      this.network = network;
-      this.backups = backups;
-      this.snapshots = snapshots;
-      this.features = features;
+   public static Droplet create(int id, String name, int memory, int vcpus, int disk, Region region, Image image,
+         Kernel kernel, String size, boolean locked, String created, Status status, Network network,
+         List<Integer> backups, List<Integer> snapshots, List<String> features) {
+      return new AutoValue_Droplet(id, name, memory, vcpus, disk, region, image,
+            kernel, size, locked, created, status, network,
+            copyOf(backups),  copyOf(snapshots), copyOf(features));
    }
 
-
-   public int getId() {
-      return id;
-   }
-
-   public String getName() {
-      return name;
-   }
-
-   public int getMemory() {
-      return memory;
-   }
-
-   public int getVcpus() {
-      return vcpus;
-   }
-
-   public int getDisk() {
-      return disk;
-   }
-
-   public Region getRegion() {
-      return region;
-   }
-
-   public Image getImage() {
-      return image;
-   }
-
-   public Kernel getKernel() {
-      return kernel;
-   }
-
-   public String getSize() {
-      return size;
-   }
-
-   public boolean isLocked() {
-      return locked;
-   }
-
-   public String getCreated_at() {
-      return created_at;
-   }
-
-   public Status getStatus() {
-      return status;
-   }
-
-   public Network getNetwork() {
-      return network;
-   }
-
-   public int[] getBackups() {
-      return backups;
-   }
-
-   public int[] getSnapshots() {
-      return snapshots;
-   }
-
-   public String[] getFeatures() {
-      return features;
-   }
-
-   @Override public String toString() {
-      return "Droplet{" +
-            "id=" + id +
-            ", name='" + name + '\'' +
-            ", memory=" + memory +
-            ", vcpus=" + vcpus +
-            ", disk=" + disk +
-            ", region=" + region +
-            ", image=" + image +
-            ", kernel=" + kernel +
-            ", size=" + size +
-            ", locked=" + locked +
-            ", created_at='" + created_at + '\'' +
-            ", status='" + status + '\'' +
-            ", network=" + network +
-            ", backups=" + Arrays.toString(backups) +
-            ", snapshots=" + Arrays.toString(snapshots) +
-            ", features=" + Arrays.toString(features) +
-            '}';
-   }
 
    public Set<Network.Address> getPublicAddresses() {
       ImmutableSet.Builder<Network.Address> addressBuilder = new ImmutableSet.Builder<Network.Address>();
-      addressBuilder.addAll(network.getIpv4Networks())
-            .addAll(network.getIpv6Networks());
+      addressBuilder.addAll(network().getIpv4Networks())
+            .addAll(network().getIpv6Networks());
       return FluentIterable
             .from(addressBuilder.build())
             .filter(Network.Predicates.publicNetworks())
