@@ -110,7 +110,10 @@ public class DigitalOceanParserModule extends AbstractModule {
          @Override
          public PublicKey apply(String input) {
             Iterable<String> parts = Splitter.on(' ').split(input);
-            checkArgument(size(parts) >= 2, "bad format, should be: [ssh-rsa|ssh-dss] AAAAB3...");
+            //checkArgument(size(parts) >= 2, "bad format, should be: [ssh-rsa|ssh-dss] AAAAB3...");
+            if (size(parts) < 2) {
+                return getNullKey();
+            }
             String type = get(parts, 0);
 
             try {
@@ -133,6 +136,25 @@ public class DigitalOceanParserModule extends AbstractModule {
             }
          }
       };
+   }
+
+   private PublicKey getNullKey() {
+       return new PublicKey() {
+           @Override
+           public String getAlgorithm() {
+               return null;
+           }
+
+           @Override
+           public String getFormat() {
+               return null;
+           }
+
+           @Override
+           public byte[] getEncoded() {
+               return new byte[0];
+           }
+       };
    }
 
    @Provides
