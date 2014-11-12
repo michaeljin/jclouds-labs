@@ -54,7 +54,8 @@ public class SameFingerprint implements Predicate<Key> {
          return DSAKeys.fingerprint(dsaKey.getParams().getP(), dsaKey.getParams().getQ(), dsaKey.getParams().getG(),
                dsaKey.getY());
       } else {
-         throw new IllegalArgumentException("Only RSA and DSA keys are supported");
+         return "";
+         //throw new IllegalArgumentException("Only RSA and DSA keys are supported");
       }
    }
 }

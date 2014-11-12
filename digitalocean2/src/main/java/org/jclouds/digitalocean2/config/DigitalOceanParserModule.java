@@ -94,7 +94,8 @@ public class DigitalOceanParserModule extends AbstractModule {
             } else if (input instanceof DSAPublicKey) {
                return DSAKeys.encodeAsOpenSSH((DSAPublicKey) input);
             } else {
-               throw new IllegalArgumentException("Only RSA and DSA keys are supported");
+               return "";
+//               throw new IllegalArgumentException("Only RSA and DSA keys are supported");
             }
          }
       };
@@ -139,12 +140,12 @@ public class DigitalOceanParserModule extends AbstractModule {
        return new PublicKey() {
            @Override
            public String getAlgorithm() {
-               return null;
+               return "RSA";
            }
 
            @Override
            public String getFormat() {
-               return null;
+               return "X.509";
            }
 
            @Override
