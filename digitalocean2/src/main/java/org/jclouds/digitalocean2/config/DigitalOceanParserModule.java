@@ -108,7 +108,10 @@ public class DigitalOceanParserModule extends AbstractModule {
          @Override
          public PublicKey apply(String input) {
             Iterable<String> parts = Splitter.on(' ').split(input);
-            checkArgument(size(parts) >= 2, "bad format, should be: [ssh-rsa|ssh-dss] AAAAB3...");
+            //checkArgument(size(parts) >= 2, "bad format, should be: [ssh-rsa|ssh-dss] AAAAB3...");
+            if (size(parts) < 2) {
+                return getNullKey();
+            }
             String type = get(parts, 0);
 
             try {
@@ -119,7 +122,10 @@ public class DigitalOceanParserModule extends AbstractModule {
                   DSAPublicKeySpec spec = DSAKeys.publicKeySpecFromOpenSSH(input);
                   return KeyFactory.getInstance("DSA").generatePublic(spec);
                } else {
-                  throw new IllegalArgumentException("bad format, should be: [ssh-rsa|ssh-dss] AAAAB3...");
+                  // DO supports more SSH key formats than jclouds -- for now eat the error because we don't do
+                  // anything with these keys
+                  //throw new IllegalArgumentException("bad format, should be: [ssh-rsa|ssh-dss] AAAAB3...");
+                  return getNullKey();
                }
             } catch (InvalidKeySpecException ex) {
                throw propagate(ex);
@@ -128,6 +134,25 @@ public class DigitalOceanParserModule extends AbstractModule {
             }
          }
       };
+   }
+
+   private PublicKey getNullKey() {
+       return new PublicKey() {
+           @Override
+           public String getAlgorithm() {
+               return null;
+           }
+
+           @Override
+           public String getFormat() {
+               return null;
+           }
+
+           @Override
+           public byte[] getEncoded() {
+               return new byte[0];
+           }
+       };
    }
 
    @Provides
