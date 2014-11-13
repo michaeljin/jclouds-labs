@@ -16,19 +16,24 @@
  */
 package org.jclouds.digitalocean2.features;
 
+import static org.jclouds.digitalocean2.domain.Droplet.Status.ACTIVE;
+import static org.jclouds.digitalocean2.domain.Droplet.Status.OFF;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertNull;
+import static org.testng.Assert.assertTrue;
 
 import java.util.Set;
 
 import org.jclouds.digitalocean2.domain.Action;
 import org.jclouds.digitalocean2.domain.Backup;
 import org.jclouds.digitalocean2.domain.Droplet;
+import org.jclouds.digitalocean2.domain.DropletCreate;
 import org.jclouds.digitalocean2.domain.Kernel;
 import org.jclouds.digitalocean2.domain.Snapshot;
 import org.jclouds.digitalocean2.internal.BaseDigitalOcean2LiveTest;
 import org.testng.annotations.Test;
+import com.google.common.collect.Iterables;
 
 public class DropletApiLiveTest extends BaseDigitalOcean2LiveTest {
 
@@ -39,50 +44,69 @@ public class DropletApiLiveTest extends BaseDigitalOcean2LiveTest {
 
    @Test(groups = "live", dependsOnMethods = "testCreate")
    public void testListDroplets() {
-
+//      Droplet droplet = api().getDroplet(dropletId);
       Set<Droplet> droplets = api().listDroplets();
-      assertEquals(droplets.size(), 1);
+      assertTrue(droplets.size() == 1, "The created droplet must be in the list");
    }
 
-   @Test(groups = "live", dependsOnMethods = "testCreate")
+//   @Test(groups = "live", dependsOnMethods = "testPowerOn")
+   @Test(groups = "live", dependsOnMethods = "testBackups")
    public void testListKernels() {
-
       Set<Droplet> droplets = api().listDroplets();
       Set<Kernel> kernels = api().listKernels(droplets.iterator().next().id());
-      assertEquals(kernels.iterator().next().getName(), "DO-recovery-static-fsck");
+      assertEquals(kernels.iterator().next().name(), "DO-recovery-static-fsck");
    }
 
-   @Test(groups = "live", dependsOnMethods = "testCreate")
+   @Test(groups = "live", dependsOnMethods = "testPowerOff")
    public void testSnapshots() {
-
-      Set<Droplet> droplets = api().listDroplets();
-      Set<Snapshot> snapshots = api().listSnapshots(droplets.iterator().next().id());
-      assertEquals(snapshots.iterator().next().getName(), "jclouds-test-snapshot");
+      Action action = api().snapshot(dropletId, prefix + dropletId + "-snapshot");
+      assertActionCompleted(action);
+      Set<Snapshot> snapshots = api().listSnapshots(dropletId);
+      assertEquals(snapshots.size(), 1, "Must contain 1 snapshot");
    }
 
-   @Test(groups = "live", dependsOnMethods = "testCreate")
+   @Test(groups = "live", dependsOnMethods = "testSnapshots")
    public void testBackups() {
 
-//      Can't even find docs for this one
+//      Can't find docs for this one at the moment
       Set<Droplet> droplets = api().listDroplets();
       Set<Backup> backups = api().listBackups(droplets.iterator().next().id());
 //      assertEquals(backups.iterator().next().getName(), "jclouds-test-snapshot");
    }
 
-   @Test(groups = "live", dependsOnMethods = "testCreate")
+   @Test(groups = "live", dependsOnMethods = "testListKernels")
    public void testActions() {
       Set<Droplet> droplets = api().listDroplets();
       Set<Action> actions = api().listActions(droplets.iterator().next().id());
-      assertEquals(actions.iterator().next().getType(), "power_cycle");
+      assertEquals(actions.iterator().next().type(), "snapshot");
    }
 
    @Test(groups = "live")
    public void testCreate() {
-      Droplet droplet = api().create("test1", "nyc3", "512mb", "ubuntu-14-04-x64");
-      dropletId = droplet.id();
-      droplet.status();
-
+      DropletCreate dropletCreate = api().create("test1", "nyc3", "512mb", "ubuntu-14-04-x64");
+      assertActionCompleted(Iterables.getOnlyElement(dropletCreate.links().actions()));
+      dropletId = dropletCreate.droplet().id();
+      Droplet droplet = api().getDroplet(dropletId);
+      assertNotNull(droplet, "Droplet should not be null");
    }
+
+   @Test(groups = "live", dependsOnMethods = "testGet")
+   public void testPowerOff() {
+      Action action = api().powerOff(dropletId);
+      assertActionCompleted(action);
+      Droplet droplet = api().getDroplet(dropletId);
+      assertEquals(droplet.status(), OFF, "Droplet should be off");
+   }
+
+/* Apparently the droplet is powered on automatically after taking a snapshot
+   @Test(groups = "live", dependsOnMethods = "testBackups")
+   public void testPowerOn() {
+      Action action = api().powerOn(dropletId);
+      assertActionCompleted(action);
+      Droplet droplet = api().getDroplet(dropletId);
+      assertEquals(droplet.status(), ACTIVE, "Droplet should be Active");
+   }
+*/
 
    @Test(groups = "live", dependsOnMethods = "testCreate")
    public void testGet() {
@@ -91,10 +115,10 @@ public class DropletApiLiveTest extends BaseDigitalOcean2LiveTest {
 
    }
 
-   @Test(groups = "live", dependsOnMethods = "testGet")
+   @Test(groups = "live", dependsOnMethods = "testActions")
    public void testDelete() throws InterruptedException {
       api().deleteDroplet(dropletId);
-      Thread.sleep(10000);
+      assertNodeTerminated(dropletId);
       Droplet droplet = api().getDroplet(dropletId);
       assertNull(droplet);
 

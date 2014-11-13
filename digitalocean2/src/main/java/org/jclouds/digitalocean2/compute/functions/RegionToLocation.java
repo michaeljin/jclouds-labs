@@ -47,7 +47,7 @@ public class RegionToLocation implements Function<Region, Location> {
    @Override
    public Location apply(Region input) {
       LocationBuilder builder = new LocationBuilder();
-      builder.id(input.getSlug());
+      builder.id(input.slug());
       builder.description(encodeRegionIdAndName(input));
       builder.scope(LocationScope.REGION);
       builder.parent(getOnlyElement(justProvider.get()));

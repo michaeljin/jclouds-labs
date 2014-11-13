@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jclouds.digitalocean2.compute.strategy;
+package org.jclouds.digitalocean2.compute;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.collect.Iterables.contains;
@@ -24,6 +24,7 @@ import static org.jclouds.compute.config.ComputeServiceProperties.TIMEOUT_NODE_S
 import static org.jclouds.compute.config.ComputeServiceProperties.TIMEOUT_NODE_TERMINATED;
 import static org.jclouds.digitalocean2.compute.util.LocationNamingUtils.extractRegionId;
 
+import java.util.concurrent.atomic.AtomicReference;
 import javax.annotation.Resource;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -43,7 +44,9 @@ import org.jclouds.digitalocean2.domain.options.CreateDropletOptions;
 import org.jclouds.domain.LoginCredentials;
 import org.jclouds.logging.Logger;
 import com.google.common.base.Predicate;
+import com.google.common.collect.Iterables;
 import com.google.common.primitives.Ints;
+import com.google.common.util.concurrent.Atomics;
 
 /**
  * Implementation of the Compute Service for the DigitalOcean API.
@@ -55,14 +58,14 @@ public class DigitalOceanComputeServiceAdapter implements ComputeServiceAdapter<
    protected Logger logger = Logger.NULL;
 
    private final DigitalOcean2Api api;
-   private final Predicate<DropletCreate.Action> nodeRunningPredicate;
-   private final Predicate<Action> nodeStoppedPredicate;
-   private final Predicate<Action> nodeTerminatedPredicate;
+   private final Predicate<AtomicReference<Action>> nodeRunningPredicate;
+   private final Predicate<AtomicReference<Action>> nodeStoppedPredicate;
+   private final Predicate<Integer> nodeTerminatedPredicate;
 
    @Inject DigitalOceanComputeServiceAdapter(DigitalOcean2Api api,
-         @Named(TIMEOUT_NODE_RUNNING) Predicate<DropletCreate.Action> nodeRunningPredicate,
-         @Named(TIMEOUT_NODE_SUSPENDED) Predicate<Action> nodeStoppedPredicate,
-         @Named(TIMEOUT_NODE_TERMINATED) Predicate<Action> nodeTerminatedPredicate) {
+         @Named(TIMEOUT_NODE_RUNNING) Predicate<AtomicReference<Action>> nodeRunningPredicate,
+         @Named(TIMEOUT_NODE_SUSPENDED) Predicate<AtomicReference<Action>> nodeStoppedPredicate,
+         @Named(TIMEOUT_NODE_TERMINATED) Predicate<Integer> nodeTerminatedPredicate) {
       this.api = checkNotNull(api, "api cannot be null");
       this.nodeRunningPredicate = checkNotNull(nodeRunningPredicate, "nodeRunningPredicate cannot be null");
       this.nodeStoppedPredicate = checkNotNull(nodeStoppedPredicate, "nodeStoppedPredicate cannot be null");
@@ -98,8 +101,8 @@ public class DigitalOceanComputeServiceAdapter implements ComputeServiceAdapter<
 
       // We have to actively wait until the droplet has been provisioned until
       // we can build the entire Droplet object we want to return
-      nodeRunningPredicate.apply(dropletCreated.getLinks().getActions()[0]);
-      Droplet droplet = api.getDropletApi().getDroplet(dropletCreated.getDroplet().id());
+      nodeRunningPredicate.apply(Atomics.newReference(Iterables.getOnlyElement(dropletCreated.links().actions())));
+      Droplet droplet = api.getDropletApi().getDroplet(dropletCreated.droplet().id());
 
       LoginCredentials defaultCredentials = LoginCredentials.builder().user("root")
             .privateKey(templateOptions.getLoginPrivateKey()).build();
@@ -109,7 +112,7 @@ public class DigitalOceanComputeServiceAdapter implements ComputeServiceAdapter<
 
    @Override
    public Iterable<Image> listImages() {
-      return api.getImageApi().listImages();
+      return api.getImageApi().listImages(100);
    }
 
    @Override
@@ -123,7 +126,7 @@ public class DigitalOceanComputeServiceAdapter implements ComputeServiceAdapter<
       return filter(api.getRegionApi().listRegions(), new Predicate<Region>() {
          @Override
          public boolean apply(Region region) {
-            return region.isAvailable();
+            return region.available();
          }
       });
    }
@@ -160,9 +163,10 @@ public class DigitalOceanComputeServiceAdapter implements ComputeServiceAdapter<
    public void destroyNode(String id) {
       // We have to wait here, as the api does not properly populate the state
       // but fails if there is a pending event
-      api.getDropletApi().deleteDroplet(Integer.parseInt(id));
+      int dropletId = Integer.parseInt(id);
+      api.getDropletApi().deleteDroplet(dropletId);
       //TODO: Need to check action
-//      nodeTerminatedPredicate.apply(event);
+      nodeTerminatedPredicate.apply(dropletId);
    }
 
 
@@ -171,26 +175,24 @@ public class DigitalOceanComputeServiceAdapter implements ComputeServiceAdapter<
    public void rebootNode(String id) {
       // We have to wait here, as the api does not properly populate the state
       // but fails if there is a pending event
-      api.getDropletApi().reboot(Integer.parseInt(id));
-//      nodeRunningPredicate.apply(event);
+      Action action = api.getDropletApi().reboot(Integer.parseInt(id));
+      nodeRunningPredicate.apply(Atomics.newReference(action));
    }
 
    @Override
    public void resumeNode(String id) {
       // We have to wait here, as the api does not properly populate the state
       // but fails if there is a pending event
-      api.getDropletApi().powerOn(Integer.parseInt(id));
-//      TODO
-//      nodeRunningPredicate.apply(event);
+      Action action = api.getDropletApi().powerOn(Integer.parseInt(id));
+      nodeRunningPredicate.apply(Atomics.newReference(action));
    }
 
    @Override
    public void suspendNode(String id) {
       // We have to wait here, as the api does not properly populate the state
       // but fails if there is a pending event
-      api.getDropletApi().powerOff(Integer.parseInt(id));
-      //TODO
-//      nodeStoppedPredicate.apply(event);
+      Action action = api.getDropletApi().powerOff(Integer.parseInt(id));
+      nodeStoppedPredicate.apply(Atomics.newReference(action));
    }
 
 }

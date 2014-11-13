@@ -23,13 +23,18 @@ import java.util.Set;
 import javax.inject.Named;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
+import org.jclouds.Fallbacks;
 import org.jclouds.Fallbacks.EmptyIterableWithMarkerOnNotFoundOr404;
+import org.jclouds.Fallbacks.EmptySetOnNotFoundOr404;
 import org.jclouds.digitalocean2.domain.Image;
+import org.jclouds.javax.annotation.Nullable;
 import org.jclouds.oauth.v2.filters.OAuthAuthenticationFilter;
 import org.jclouds.rest.annotations.Fallback;
 import org.jclouds.rest.annotations.RequestFilters;
@@ -49,8 +54,8 @@ public interface ImageApi extends Closeable {
    @Named("image:list")
    @GET
    @SelectJson("images")
-   @Fallback(EmptyIterableWithMarkerOnNotFoundOr404.class)
-   Set<Image> listImages();
+   @Fallback(EmptySetOnNotFoundOr404.class)
+   Set<Image> listImages(@Nullable @DefaultValue("100") @QueryParam("per_page") int perPage);
 
    @Named("image:get")
    @GET

@@ -16,63 +16,34 @@
  */
 package org.jclouds.digitalocean2.domain;
 
-import java.beans.ConstructorProperties;
+import static com.google.common.collect.ImmutableList.copyOf;
 
-public class DropletCreate {
-   private final Droplet droplet;
-   private final Links links;
+import java.util.List;
 
-   public static class Links {
-      Action[] actions;
+import org.jclouds.json.SerializedNames;
+import com.google.auto.value.AutoValue;
 
-      @ConstructorProperties({ "actions" })
-      Links(Action[] actions) {
-         this.actions = actions;
+@AutoValue
+public abstract class DropletCreate {
+   public abstract Droplet droplet();
+   public abstract Links links();
+
+   @AutoValue
+   public abstract static class Links {
+      public abstract List<Action> actions();
+
+      @SerializedNames({ "actions" })
+      public static Links create(List<Action> actions) {
+         return new AutoValue_DropletCreate_Links(copyOf(actions));
       }
 
-      public Action[] getActions() {
-         return actions;
-      }
+      Links() {}
    }
 
-   public static class Action {
-      private final int id;
-      private final String rel;
-      private final String href;
-
-      @ConstructorProperties({ "id", "rel", "href" })
-      Action(int id, String rel, String href) {
-         this.id = id;
-         this.rel = rel;
-         this.href = href;
-      }
-
-      public int getId() {
-         return id;
-      }
-
-      public String getRel() {
-         return rel;
-      }
-
-      public String getHref() {
-         return href;
-      }
+   @SerializedNames({ "droplet", "links" })
+   public static DropletCreate create(Droplet droplet, Links links) {
+      return new AutoValue_DropletCreate(droplet, links);
    }
 
-   @ConstructorProperties({ "droplet", "links" })
-   public DropletCreate(Droplet droplet, Links links) {
-      this.droplet = droplet;
-      this.links = links;
-
-
-   }
-
-   public Links getLinks() {
-      return links;
-   }
-
-   public Droplet getDroplet() {
-      return droplet;
-   }
+   DropletCreate() {}
 }

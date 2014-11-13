@@ -41,8 +41,8 @@ public class SameFingerprint implements Predicate<Key> {
    @Override
    public boolean apply(Key key) {
       checkNotNull(key, "key cannot be null");
-      checkNotNull(key.getPublicKey(), "public key cannot be null");
-      return fingerprint.equals(computeFingerprint(key.getPublicKey()));
+      checkNotNull(key.publicKey(), "public key cannot be null");
+      return fingerprint.equals(computeFingerprint(key.publicKey()));
    }
 
    public static String computeFingerprint(PublicKey key) {

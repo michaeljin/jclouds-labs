@@ -36,22 +36,21 @@ public class SizeToHardware implements Function<Size, Hardware> {
    @Override
    public Hardware apply(Size input) {
       HardwareBuilder builder = new HardwareBuilder();
-      builder.id(input.getSlug());
-      builder.providerId(input.getSlug());
-      builder.name(input.getSlug());
-      builder.ram(input.getMemory());
-      // DigitalOcean does not provide the processor speed. We configure it to
-      // make the bigger template the faster.
-      builder.processor(new Processor(input.getVcpus(), input.getVcpus()));
+      builder.id(input.slug());
+      builder.providerId(input.slug());
+      builder.name(input.slug());
+      builder.ram(input.memory());
+      // No cpu speed from DigitalOcean API, so assume more cores == faster
+      builder.processor(new Processor(input.vcpus(), input.vcpus()));
 
       builder.volume(new VolumeBuilder() 
-            .size(Float.valueOf(input.getDisk())) 
+            .size(Float.valueOf(input.disk()))
             .type(Type.LOCAL) 
             .build());
 
       ImmutableMap.Builder<String, String> metadata = ImmutableMap.builder();
-      metadata.put("costPerHour", String.valueOf(input.getPriceHourly()));
-      metadata.put("costPerMonth", String.valueOf(input.getPriceMonthly()));
+      metadata.put("costPerHour", String.valueOf(input.priceHourly()));
+      metadata.put("costPerMonth", String.valueOf(input.priceMonthly()));
       builder.userMetadata(metadata.build());
 
       return builder.build();

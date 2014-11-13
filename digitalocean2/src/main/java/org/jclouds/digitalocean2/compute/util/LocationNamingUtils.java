@@ -65,6 +65,6 @@ public class LocationNamingUtils {
     */
    public static String encodeRegionIdAndName(Region region) {
       checkNotNull(region, "region cannot be null");
-      return region.getSlug() + "/" + region.getName();
+      return region.slug() + "/" + region.name();
    }
 }

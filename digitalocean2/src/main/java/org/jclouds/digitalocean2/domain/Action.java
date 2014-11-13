@@ -22,11 +22,15 @@ import static com.google.common.base.Preconditions.checkArgument;
 import java.beans.ConstructorProperties;
 import java.lang.reflect.Field;
 
+import org.jclouds.javax.annotation.Nullable;
+import org.jclouds.json.SerializedNames;
+import com.google.auto.value.AutoValue;
 import com.google.common.base.Enums;
 import com.google.common.base.Joiner;
 import com.google.common.base.Optional;
 
-public class Action {
+@AutoValue
+public abstract class Action {
    public enum Status {
       COMPLETED, INPROGRESS("in-progress"), ERROR;
 
@@ -40,8 +44,7 @@ public class Action {
          }
       }
 
-      Status() {
-      }
+      Status() {}
 
       public static Status fromValue(String value) {
          Optional<Status> status = Enums.getIfPresent(Status.class, value.toUpperCase());
@@ -50,71 +53,24 @@ public class Action {
       }
    }
 
-   private final int id;
-   private final Status status;
-   private final String type;
-   private final String started_at;
-   private final String completed_at;
-   private final int resource_id;
-   private final String resource_type;
-   private final String region;
+   public abstract int id();
+   @Nullable public abstract String rel();
+   @Nullable public abstract String href();
+   @Nullable public abstract Status status();
+   @Nullable public abstract String type();
+   @Nullable public abstract String started_at();
+   @Nullable public abstract String completed_at();
+   @Nullable public abstract int resource_id();
+   @Nullable public abstract String resource_type();
+   @Nullable public abstract String region();
 
-   @ConstructorProperties({ "id", "status", "type", "started_at", "completed_at", "resource_id",
+   @SerializedNames({ "id", "rel", "href", "status", "type", "started_at", "completed_at", "resource_id",
          "resource_type", "region" })
-   public Action(int id, Status status, String type, String started_at, String completed_at, int resource_id,
+   public static Action create(int id, String rel, String href, Status status, String type, String started_at, String completed_at, int resource_id,
          String resource_type, String region) {
-      this.id = id;
-      this.status = status;
-      this.type = type;
-      this.started_at = started_at;
-      this.completed_at = completed_at;
-      this.resource_id = resource_id;
-      this.resource_type = resource_type;
-      this.region = region;
+      return new AutoValue_Action(id, rel, href, status, type, started_at, completed_at, resource_id,
+      resource_type, region);
    }
 
-   public int getId() {
-      return id;
-   }
-
-   public Status getStatus() {
-      return status;
-   }
-
-   public String getType() {
-      return type;
-   }
-
-   public String getStarted_at() {
-      return started_at;
-   }
-
-   public String getCompleted_at() {
-      return completed_at;
-   }
-
-   public int getResource_id() {
-      return resource_id;
-   }
-
-   public String getResource_type() {
-      return resource_type;
-   }
-
-   public String getRegion() {
-      return region;
-   }
-
-   @Override public String toString() {
-      return "Action{" +
-            "id=" + id +
-            ", status='" + status + '\'' +
-            ", type='" + type + '\'' +
-            ", started_at='" + started_at + '\'' +
-            ", completed_at='" + completed_at + '\'' +
-            ", resource_id=" + resource_id +
-            ", resource_type='" + resource_type + '\'' +
-            ", region='" + region + '\'' +
-            '}';
-   }
+   Action() {}
 }

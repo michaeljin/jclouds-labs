@@ -16,52 +16,25 @@
  */
 package org.jclouds.digitalocean2.domain;
 
-import java.beans.ConstructorProperties;
 import java.security.PublicKey;
 import javax.inject.Named;
 
-/**
- * A droplet.
- */
-public class Key {
+import org.jclouds.json.SerializedNames;
+import com.google.auto.value.AutoValue;
 
-   private final int id;
-   private final String name;
-   private final String fingerprint;
+@AutoValue
+public abstract class Key {
+
+   public abstract int id();
+   public abstract String name();
+   public abstract String fingerprint();
    @Named("public_key")
-   private final PublicKey publicKey;
+   public abstract PublicKey publicKey();
 
-   @ConstructorProperties({ "id", "name", "fingerprint", "public_key" })
-
-   public Key(int id, String name, String fingerprint, PublicKey publicKey) {
-      this.id = id;
-      this.name = name;
-      this.fingerprint = fingerprint;
-      this.publicKey = publicKey;
+   @SerializedNames({ "id", "name", "fingerprint", "public_key" })
+   public static Key create(int id, String name, String fingerprint, PublicKey publicKey) {
+      return new AutoValue_Key(id, name, fingerprint, publicKey);
    }
 
-   public int getId() {
-      return id;
-   }
-
-   public String getName() {
-      return name;
-   }
-
-   public String getFingerprint() {
-      return fingerprint;
-   }
-
-   public PublicKey getPublicKey() {
-      return publicKey;
-   }
-
-   @Override public String toString() {
-      return "Key{" +
-            "id=" + id +
-            ", name='" + name + '\'' +
-            ", fingerprint='" + fingerprint + '\'' +
-            ", publicKey='" + publicKey + '\'' +
-            '}';
-   }
+   Key() {}
 }

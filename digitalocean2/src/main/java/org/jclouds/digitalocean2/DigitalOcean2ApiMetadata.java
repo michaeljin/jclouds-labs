@@ -17,6 +17,7 @@
 package org.jclouds.digitalocean2;
 
 import static org.jclouds.Constants.PROPERTY_SESSION_INTERVAL;
+import static org.jclouds.compute.config.ComputeServiceProperties.TEMPLATE;
 import static org.jclouds.digitalocean2.DigitalOcean2Constants.DIGITALOCEANV2_PROVIDER_NAME;
 import static org.jclouds.oauth.v2.config.OAuthProperties.AUDIENCE;
 import static org.jclouds.oauth.v2.config.OAuthProperties.SIGNATURE_OR_MAC_ALGORITHM;
@@ -25,8 +26,10 @@ import static org.jclouds.reflect.Reflection2.typeToken;
 import java.net.URI;
 import java.util.Properties;
 
+import org.jclouds.Constants;
 import org.jclouds.apis.ApiMetadata;
 import org.jclouds.compute.ComputeServiceContext;
+import org.jclouds.compute.config.ComputeServiceProperties;
 import org.jclouds.digitalocean2.compute.config.DigitalOceanComputeServiceContextModule;
 import org.jclouds.digitalocean2.config.DigitalOcean2HttpApiModule;
 import org.jclouds.digitalocean2.config.DigitalOceanParserModule;
@@ -65,7 +68,7 @@ public class DigitalOcean2ApiMetadata extends BaseHttpApiMetadata<DigitalOcean2A
       properties.put(AUDIENCE, "https://cloud.digitalocean.com/v1/oauth/token");
       properties.put(SIGNATURE_OR_MAC_ALGORITHM, OAuthConstants.NO_ALGORITHM);
       properties.put(PROPERTY_SESSION_INTERVAL, 3600);
-//      properties.setProperty(TEMPLATE, "osFamily=DEBIAN,osVersionMatches=7\\..*,locationId=us-central1-a,loginUser=jclouds");
+      properties.put(TEMPLATE, "osFamily=UBUNTU,osVersionMatches=1[24]\\.04.*");
       properties.put(OAuthProperties.CREDENTIAL_TYPE, CredentialType.BEARER_TOKEN_CREDENTIALS.toString());
       return properties;
    }

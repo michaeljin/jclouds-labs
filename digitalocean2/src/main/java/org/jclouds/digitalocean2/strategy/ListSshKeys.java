@@ -24,7 +24,6 @@ import static com.google.common.util.concurrent.Futures.getUnchecked;
 import java.util.List;
 import java.util.concurrent.Callable;
 import javax.inject.Inject;
-import javax.inject.Singleton;
 
 import org.jclouds.digitalocean2.DigitalOcean2Api;
 import org.jclouds.digitalocean2.domain.Key;
@@ -40,7 +39,6 @@ import com.google.inject.assistedinject.Assisted;
  * <p>
  * This strategy provides a helper to get all the keys with all details populated.
  */
-@Singleton
 public class ListSshKeys {
 
    public interface Factory {
@@ -66,7 +64,7 @@ public class ListSshKeys {
                   return executor.submit(new Callable<Key>() {
                      @Override
                      public Key call() throws Exception {
-                        return keyPairApi.getKey(input.getId());
+                        return keyPairApi.getKey(input.id());
                      }
                   });
                }

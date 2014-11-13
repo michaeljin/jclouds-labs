@@ -22,6 +22,7 @@ import static com.google.common.collect.ImmutableList.copyOf;
 import java.util.List;
 import java.util.Set;
 
+import org.jclouds.javax.annotation.Nullable;
 import org.jclouds.json.SerializedNames;
 import com.google.auto.value.AutoValue;
 import com.google.common.base.Enums;
@@ -30,9 +31,6 @@ import com.google.common.base.Optional;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.ImmutableSet;
 
-/**
- * A droplet.
- */
 @AutoValue
 public abstract class Droplet {
    public enum Status {
@@ -49,16 +47,16 @@ public abstract class Droplet {
    public abstract int memory();
    public abstract int vcpus();
    public abstract int disk();
-   public abstract Region region();
-   public abstract Image image();
+   @Nullable public abstract Region region();
+   @Nullable public abstract Image image();
    public abstract Kernel kernel();
    public abstract String size();
    public abstract boolean locked();
    public abstract String created();
    public abstract Status status();
-   public abstract Network network();
-   public abstract List<Integer> backups();
-   public abstract List<Integer> snapshots();
+   @Nullable public abstract Network network();
+   @Nullable public abstract List<Integer> backups();
+   @Nullable public abstract List<Integer> snapshots();
    public abstract List<String> features();
 
    @SerializedNames({ "id", "name", "memory", "vcpus", "disk", "region", "image", "kernel",
@@ -81,4 +79,16 @@ public abstract class Droplet {
             .filter(Network.Predicates.publicNetworks())
             .toSet();
    }
+
+   public Set<Network.Address> getPrivateAddresses() {
+      ImmutableSet.Builder<Network.Address> addressBuilder = new ImmutableSet.Builder<Network.Address>();
+      addressBuilder.addAll(network().getIpv4Networks())
+            .addAll(network().getIpv6Networks());
+      return FluentIterable
+            .from(addressBuilder.build())
+            .filter(Network.Predicates.privateNetworks())
+            .toSet();
+   }
+
+   Droplet(){}
 }

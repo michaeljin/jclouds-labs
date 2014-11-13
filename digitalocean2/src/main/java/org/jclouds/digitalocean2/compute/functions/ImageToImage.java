@@ -16,6 +16,7 @@
  */
 package org.jclouds.digitalocean2.compute.functions;
 
+import static com.google.common.base.Preconditions.checkNotNull;
 import static org.jclouds.compute.domain.OperatingSystem.builder;
 
 import javax.inject.Singleton;
@@ -37,25 +38,32 @@ public class ImageToImage implements Function<Image, org.jclouds.compute.domain.
    public org.jclouds.compute.domain.Image apply(final Image input) {
       ImageBuilder builder = new ImageBuilder();
       // Private images don't have a slug
-      builder.id(input.getSlug().or(String.valueOf(input.getId())));
-      builder.providerId(String.valueOf(input.getId()));
-      builder.name(input.getName());
-      builder.description(input.getName());
+      builder.id(String.valueOf(input.id()));
+      builder.providerId(String.valueOf(input.id()));
+      builder.name(input.name());
+      builder.description(input.name());
       builder.status(Status.AVAILABLE);
 
-      OperatingSystem os = input.getOs();
+      OperatingSystem os;
+
+      if (input.name() != null && input.distribution() != null) {
+         os = OperatingSystem.builder().from(input.name(), input.distribution()).build();
+      } else {
+         os = null;
+      }
+
 
       builder.operatingSystem(builder()
-            .name(input.getName()) 
+            .name(input.name())
             .family(os.getDistribution().getOsFamily()) 
-            .description(input.getName()) 
+            .description(input.name())
             .arch(os.getArch()) 
             .version(os.getVersion()) 
             .is64Bit(os.is64bit()) 
             .build());
 
       ImmutableMap.Builder<String, String> metadata = ImmutableMap.builder();
-      metadata.put("publicImage", String.valueOf(input.isPublic()));
+      metadata.put("publicImage", String.valueOf(input.ispublic()));
       builder.userMetadata(metadata.build());
 
       return builder.build();

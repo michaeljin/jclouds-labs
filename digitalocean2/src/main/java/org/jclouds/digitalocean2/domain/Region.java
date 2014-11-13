@@ -17,53 +17,23 @@
 
 package org.jclouds.digitalocean2.domain;
 
-import java.beans.ConstructorProperties;
-import java.util.Arrays;
-import java.util.Set;
+import java.util.List;
 
-public class Region {
-   private final String slug;
-   private final String name;
-   private final Set<String> sizes;
-   private final boolean available;
-   private final String[] features;
+import org.jclouds.json.SerializedNames;
+import com.google.auto.value.AutoValue;
 
-   @ConstructorProperties({ "slug", "name", "sizes", "available", "features" })
-   public Region(String slug, String name, Set<String> sizes, boolean available, String[] features) {
-      this.slug = slug;
-      this.name = name;
-      this.sizes = sizes;
-      this.available = available;
-      this.features = features;
+@AutoValue
+public abstract class Region {
+   public abstract String slug();
+   public abstract String name();
+   public abstract List<String> sizes();
+   public abstract boolean available();
+   public abstract List<String> features();
+
+   @SerializedNames({ "slug", "name", "sizes", "available", "features" })
+   public static Region create(String slug, String name, List<String> sizes, boolean available, List<String> features) {
+      return new AutoValue_Region(slug, name, sizes, available, features);
    }
 
-   public String getSlug() {
-      return slug;
-   }
-
-   public String getName() {
-      return name;
-   }
-
-   public Set<String> getSizes() {
-      return sizes;
-   }
-
-   public boolean isAvailable() {
-      return available;
-   }
-
-   public String[] getFeatures() {
-      return features;
-   }
-
-   @Override public String toString() {
-      return "Region{" +
-            "slug='" + slug + '\'' +
-            ", name='" + name + '\'' +
-            ", sizes=" + sizes +
-            ", available=" + available +
-            ", features=" + Arrays.toString(features) +
-            '}';
-   }
+   Region() {}
 }

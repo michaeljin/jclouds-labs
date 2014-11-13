@@ -136,11 +136,11 @@ public class CreateKeyPairsThenCreateNodes extends CreateNodesWithGroupEncodedIn
          String userFingerprint = SameFingerprint.computeFingerprint(userKey);
          Key newKey = api.getKeyApi().create(userFingerprint, options.getPublicKey());
 
-         generatedSshKeyIds.add(newKey.getId());
+         generatedSshKeyIds.add(newKey.id());
          logger.debug(">> key pair created! %s", newKey);
       } else {
          logger.debug(">> key pair found! %s", key.get());
-         generatedSshKeyIds.add(key.get().getId());
+         generatedSshKeyIds.add(key.get().id());
       }
    }
 
@@ -153,7 +153,7 @@ public class CreateKeyPairsThenCreateNodes extends CreateNodesWithGroupEncodedIn
       String fingerprint = SameFingerprint.computeFingerprint(defaultPublicKey);
       Key defaultKey = api.getKeyApi().create(prefix + "-" + System.getProperty("user.name"), defaultKeys.get("public"));
 
-      generatedSshKeyIds.add(defaultKey.getId());
+      generatedSshKeyIds.add(defaultKey.id());
 
       logger.debug(">> keypair created! %s", defaultKey);
 

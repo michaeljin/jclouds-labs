@@ -17,61 +17,27 @@
 
 package org.jclouds.digitalocean2.domain;
 
-import java.beans.ConstructorProperties;
+import java.util.List;
 
-import com.google.common.base.Optional;
+import org.jclouds.javax.annotation.Nullable;
+import org.jclouds.json.SerializedNames;
+import com.google.auto.value.AutoValue;
 
-public class Backup {
-   private final int id;
-   private final String name;
-   private final String distribution;
-   private final Optional<String> slug;
-   private final boolean ispublic;
-   private final String[] regions;
+@AutoValue
+public abstract class Backup {
+   public abstract int id();
+   public abstract String name();
+   public abstract String distribution();
+   @Nullable public abstract String slug();
+   public abstract boolean ispublic();
+   public abstract List<String> regions();
 
-   @ConstructorProperties({ "id", "name", "distribution", "slug", "ispublic", "regions" })
-   public Backup(int id, String name, String distribution, Optional<String> slug, boolean ispublic,
-         String[] regions) {
-      this.id = id;
-      this.name = name;
-      this.distribution = distribution;
-      this.slug = slug;
-      this.ispublic = ispublic;
-      this.regions = regions;
+   @SerializedNames({ "id", "name", "distribution", "slug", "ispublic", "regions" })
+   public static Backup create(int id, String name, String distribution, String slug, boolean ispublic,
+         List<String> regions) {
+      return new AutoValue_Backup(id, name, distribution, slug, ispublic,
+      regions);
    }
 
-   public int getId() {
-      return id;
-   }
-
-   public String getName() {
-      return name;
-   }
-
-   public String getDistribution() {
-      return distribution;
-   }
-
-   public Optional<String> getSlug() {
-      return slug;
-   }
-
-   public boolean isIspublic() {
-      return ispublic;
-   }
-
-   public String[] getRegions() {
-      return regions;
-   }
-
-   @Override public String toString() {
-      return "Backup{" +
-            "id=" + id +
-            ", name='" + name + '\'' +
-            ", distribution='" + distribution + '\'' +
-            ", slug=" + slug +
-            ", ispublic=" + ispublic +
-            ", regions=" + regions +
-            '}';
-   }
+   Backup() {}
 }

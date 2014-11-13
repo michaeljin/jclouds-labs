@@ -37,6 +37,7 @@ import org.jclouds.compute.functions.GroupNamingConvention;
 import org.jclouds.compute.reference.ComputeServiceConstants;
 import org.jclouds.digitalocean2.domain.Droplet;
 import org.jclouds.digitalocean2.domain.Network;
+import org.jclouds.digitalocean2.domain.Region;
 import org.jclouds.domain.Credentials;
 import org.jclouds.domain.Location;
 import org.jclouds.domain.LoginCredentials;
@@ -88,22 +89,21 @@ public class DropletToNodeMetadata implements Function<Droplet, NodeMetadata> {
       builder.group(groupNamingConvention.extractGroup(input.name()));
 
       builder.hardware(getHardware(input.size()));
-      builder.location(getLocation(input.region().getSlug()));
+      builder.location(getLocation(input.region()));
 
-      Optional<? extends Image> image = findImage(input.image().getId());
+      Optional<? extends Image> image = findImage(input.image().id());
       if (image.isPresent()) {
          builder.imageId(image.get().getId());
          builder.operatingSystem(image.get().getOperatingSystem());
       } else {
          logger.info(">> image with id %s for droplet %s was not found. "
                + "This might be because the image that was used to create the droplet has a new id.",
-               input.image().getId(), input.id());
+               input.image().id(), input.id());
       }
 
       builder.status(toPortableStatus.apply(input.status()));
       builder.backendStatus(input.status().name());
 
-//    TODO: Map networks
       if (!input.getPublicAddresses().isEmpty()) {
          builder.publicAddresses(FluentIterable
                      .from(input.getPublicAddresses())
@@ -115,11 +115,18 @@ public class DropletToNodeMetadata implements Function<Droplet, NodeMetadata> {
                      })
          );
       }
-/*
-      if (input.getPrivateIp() != null) {
-         builder.privateAddresses(ImmutableSet.of(input.getPrivateIp()));
+
+      if (!input.getPrivateAddresses().isEmpty()) {
+         builder.privateAddresses(FluentIterable
+               .from(input.getPrivateAddresses())
+               .transform(new Function<Network.Address, String>() {
+                  @Override
+                  public String apply(final Network.Address input) {
+                     return input.getIp();
+                  }
+               })
+         );
       }
-*/
 
       // DigitalOcean does not provide a way to get the credentials.
       // Try to return them from the credential store
@@ -158,11 +165,11 @@ public class DropletToNodeMetadata implements Function<Droplet, NodeMetadata> {
       });
    }
 
-   protected Location getLocation(final String slug) {
+   protected Location getLocation(final Region region) {
       return find(locations.get(), new Predicate<Location>() {
          @Override
          public boolean apply(Location location) {
-            return slug.equals(location.getId());
+            return region.slug().equals(location.getId());
          }
       });
    }
