@@ -16,7 +16,6 @@
  */
 package org.jclouds.digitalocean2.features;
 
-import static org.jclouds.digitalocean2.domain.Droplet.Status.ACTIVE;
 import static org.jclouds.digitalocean2.domain.Droplet.Status.OFF;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;

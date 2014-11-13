@@ -19,7 +19,6 @@ package org.jclouds.digitalocean2.domain;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
-import java.beans.ConstructorProperties;
 import java.lang.reflect.Field;
 
 import org.jclouds.javax.annotation.Nullable;

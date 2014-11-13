@@ -30,8 +30,6 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
-import org.jclouds.Fallbacks;
-import org.jclouds.Fallbacks.EmptyIterableWithMarkerOnNotFoundOr404;
 import org.jclouds.Fallbacks.EmptySetOnNotFoundOr404;
 import org.jclouds.digitalocean2.domain.Image;
 import org.jclouds.javax.annotation.Nullable;

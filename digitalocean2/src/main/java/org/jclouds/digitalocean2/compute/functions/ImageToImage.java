@@ -16,7 +16,6 @@
  */
 package org.jclouds.digitalocean2.compute.functions;
 
-import static com.google.common.base.Preconditions.checkNotNull;
 import static org.jclouds.compute.domain.OperatingSystem.builder;
 
 import javax.inject.Singleton;

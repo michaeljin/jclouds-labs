@@ -22,16 +22,12 @@ import org.jclouds.http.HttpErrorHandler;
 import org.jclouds.http.annotation.ClientError;
 import org.jclouds.http.annotation.Redirection;
 import org.jclouds.http.annotation.ServerError;
+import org.jclouds.oauth.v2.config.OAuthScopes;
 import org.jclouds.rest.ConfiguresHttpApi;
 import org.jclouds.rest.config.HttpApiModule;
 
-/**
- * Configures the GoogleCompute connection.
- */
 @ConfiguresHttpApi
 public class DigitalOcean2HttpApiModule extends HttpApiModule<DigitalOcean2Api> {
-   public DigitalOcean2HttpApiModule() {
-   }
 
    @Override
    protected void bindErrorHandlers() {
@@ -40,4 +36,13 @@ public class DigitalOcean2HttpApiModule extends HttpApiModule<DigitalOcean2Api> 
       bind(HttpErrorHandler.class).annotatedWith(ServerError.class).to(DigitalOceanErrorHandler.class);
    }
 
+   @Override
+   protected void configure() {
+      super.configure();
+      bind(OAuthScopes.class).toInstance(OAuthScopes.ReadOrWriteScopes.create(
+            "read",
+            "read write"
+      ));
+
+   }
 }
