@@ -109,7 +109,7 @@ public class DropletApiMockTest extends BaseMockWebServerTest {
                "6374124",
                options.build());
 
-         assertEquals(dropletCreated.getDroplet().name(), "digitalocean2-s-d5e");
+         assertEquals(dropletCreated.droplet().name(), "digitalocean2-s-d5e");
 
          RecordedRequest request = server.takeRequest();
          assertAuthentication(request);

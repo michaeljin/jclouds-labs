@@ -83,6 +83,14 @@ public class Network {
             }
          };
       }
+      public static Predicate<Address> privateNetworks() {
+         return new Predicate<Address>() {
+            @Override
+            public boolean apply(Address network) {
+               return network.getType().equals("private");
+            }
+         };
+      }
    }
 
 }

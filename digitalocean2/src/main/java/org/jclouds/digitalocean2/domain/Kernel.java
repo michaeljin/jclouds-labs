@@ -16,41 +16,19 @@
  */
 package org.jclouds.digitalocean2.domain;
 
-import java.beans.ConstructorProperties;
+import org.jclouds.json.SerializedNames;
+import com.google.auto.value.AutoValue;
 
-/**
- * A droplet.
- */
-public class Kernel {
+@AutoValue
+public abstract class Kernel {
+   public abstract int id();
+   public abstract String name();
+   public abstract String version();
 
-   private final int id;
-   private final String name;
-   private final String version;
-
-   @ConstructorProperties({ "id", "name", "version" })
-   public Kernel(int id, String name, String version) {
-      this.id = id;
-      this.name = name;
-      this.version = version;
+   @SerializedNames({ "id", "name", "version" })
+   public static Kernel create(int id, String name, String version) {
+      return new AutoValue_Kernel(id, name, version);
    }
 
-   public int getId() {
-      return id;
-   }
-
-   public String getName() {
-      return name;
-   }
-
-   public String getVersion() {
-      return version;
-   }
-
-   @Override public String toString() {
-      return "Kernel{" +
-            "id=" + id +
-            ", name='" + name + '\'' +
-            ", version='" + version + '\'' +
-            '}';
-   }
+   Kernel() {}
 }

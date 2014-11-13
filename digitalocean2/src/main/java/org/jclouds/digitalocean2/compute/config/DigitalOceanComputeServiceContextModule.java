@@ -21,8 +21,9 @@ import static org.jclouds.compute.config.ComputeServiceProperties.TIMEOUT_IMAGE_
 import static org.jclouds.compute.config.ComputeServiceProperties.TIMEOUT_NODE_RUNNING;
 import static org.jclouds.compute.config.ComputeServiceProperties.TIMEOUT_NODE_SUSPENDED;
 import static org.jclouds.compute.config.ComputeServiceProperties.TIMEOUT_NODE_TERMINATED;
+import static org.jclouds.util.Predicates2.retry;
 
-import javax.inject.Named;
+import java.util.concurrent.atomic.AtomicReference;
 import javax.inject.Singleton;
 
 import org.jclouds.compute.ComputeServiceAdapter;
@@ -37,6 +38,7 @@ import org.jclouds.compute.reference.ComputeServiceConstants.PollPeriod;
 import org.jclouds.compute.reference.ComputeServiceConstants.Timeouts;
 import org.jclouds.compute.strategy.CreateNodesInGroupThenAddToSet;
 import org.jclouds.digitalocean2.DigitalOcean2Api;
+import org.jclouds.digitalocean2.compute.DigitalOceanComputeServiceAdapter;
 import org.jclouds.digitalocean2.compute.extensions.DigitalOceanImageExtension;
 import org.jclouds.digitalocean2.compute.functions.DropletStatusToStatus;
 import org.jclouds.digitalocean2.compute.functions.DropletToNodeMetadata;
@@ -46,15 +48,12 @@ import org.jclouds.digitalocean2.compute.functions.SizeToHardware;
 import org.jclouds.digitalocean2.compute.functions.TemplateOptionsToStatementWithoutPublicKey;
 import org.jclouds.digitalocean2.compute.options.DigitalOceanTemplateOptions;
 import org.jclouds.digitalocean2.compute.strategy.CreateKeyPairsThenCreateNodes;
-import org.jclouds.digitalocean2.compute.strategy.DigitalOceanComputeServiceAdapter;
 import org.jclouds.digitalocean2.domain.Action;
 import org.jclouds.digitalocean2.domain.Droplet;
-import org.jclouds.digitalocean2.domain.DropletCreate;
 import org.jclouds.digitalocean2.domain.Image;
 import org.jclouds.digitalocean2.domain.Region;
 import org.jclouds.digitalocean2.domain.Size;
 import org.jclouds.domain.Location;
-import org.jclouds.util.Predicates2;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
@@ -62,6 +61,7 @@ import com.google.common.base.Predicate;
 import com.google.inject.Injector;
 import com.google.inject.Provides;
 import com.google.inject.TypeLiteral;
+import com.google.inject.name.Named;
 
 /**
  * Configures the compute service classes for the DigitalOcean API.
@@ -104,38 +104,34 @@ public class DigitalOceanComputeServiceContextModule extends
    }
 
    @Provides
-   @Singleton
    @Named(TIMEOUT_NODE_RUNNING)
-   protected Predicate<DropletCreate.Action> provideDropletRunningPredicate(final DigitalOcean2Api api, Timeouts timeouts,
+   protected Predicate<AtomicReference<Action>> provideDropletRunningPredicate(final DigitalOcean2Api api, Timeouts timeouts,
          PollPeriod pollPeriod) {
-      return Predicates2.retry(new DropletCreatedPredicate(api), timeouts.nodeRunning, pollPeriod.pollInitialPeriod,
+      return retry(new ActionDonePredicate(api), timeouts.nodeRunning, pollPeriod.pollInitialPeriod,
             pollPeriod.pollMaxPeriod);
    }
 
    @Provides
-   @Singleton
    @Named(TIMEOUT_NODE_SUSPENDED)
-   protected Predicate<Action> provideDropletSuspendedPredicate(final DigitalOcean2Api api, Timeouts timeouts,
+   protected Predicate<AtomicReference<Action>> provideDropletSuspendedPredicate(final DigitalOcean2Api api, Timeouts timeouts,
          PollPeriod pollPeriod) {
-      return Predicates2.retry(new ActionDonePredicate(api), timeouts.nodeSuspended, pollPeriod.pollInitialPeriod,
+      return retry(new ActionDonePredicate(api), timeouts.nodeSuspended, pollPeriod.pollInitialPeriod,
             pollPeriod.pollMaxPeriod);
    }
 
    @Provides
-   @Singleton
    @Named(TIMEOUT_NODE_TERMINATED)
-   protected Predicate<Action> provideDropletTerminatedPredicate(final DigitalOcean2Api api, Timeouts timeouts,
+   protected Predicate<Integer> provideDropletTerminatedPredicate(final DigitalOcean2Api api, Timeouts timeouts,
          PollPeriod pollPeriod) {
-      return Predicates2.retry(new ActionDonePredicate(api), timeouts.nodeTerminated, pollPeriod.pollInitialPeriod,
+      return retry(new DropletTerminatedPredicate(api), timeouts.nodeTerminated, pollPeriod.pollInitialPeriod,
             pollPeriod.pollMaxPeriod);
    }
 
    @Provides
-   @Singleton
    @Named(TIMEOUT_IMAGE_AVAILABLE)
-   protected Predicate<Action> provideImageAvailablePredicate(final DigitalOcean2Api api, Timeouts timeouts,
+   protected Predicate<AtomicReference<Action>> provideImageAvailablePredicate(final DigitalOcean2Api api, Timeouts timeouts,
          PollPeriod pollPeriod) {
-      return Predicates2.retry(new ActionDonePredicate(api), timeouts.imageAvailable, pollPeriod.pollInitialPeriod,
+      return retry(new ActionDonePredicate(api), timeouts.imageAvailable, pollPeriod.pollInitialPeriod,
             pollPeriod.pollMaxPeriod);
    }
 
@@ -143,12 +139,19 @@ public class DigitalOceanComputeServiceContextModule extends
    @Singleton
    protected Predicate<Region> provideRegionAvailablePredicate(final DigitalOcean2Api api, Timeouts timeouts,
          PollPeriod pollPeriod) {
-      return Predicates2.retry(new RegionAvailablePredicate(), timeouts.imageAvailable, pollPeriod.pollInitialPeriod,
+      return retry(new RegionAvailablePredicate(), timeouts.imageAvailable, pollPeriod.pollInitialPeriod,
+            pollPeriod.pollMaxPeriod);
+   }
+
+   @Provides
+   protected Predicate<AtomicReference<Action>> provideActionCompletedPredicate(final DigitalOcean2Api api, Timeouts timeouts,
+         PollPeriod pollPeriod) {
+      return retry(new ActionDonePredicate(api), timeouts.imageAvailable, pollPeriod.pollInitialPeriod,
             pollPeriod.pollMaxPeriod);
    }
 
    @VisibleForTesting
-   static class ActionDonePredicate implements Predicate<Action> {
+   static class ActionDonePredicate implements Predicate<AtomicReference<Action>> {
 
       private final DigitalOcean2Api api;
 
@@ -157,60 +160,49 @@ public class DigitalOceanComputeServiceContextModule extends
       }
 
       @Override
-      public boolean apply(Action input) {
-         Action updated = api.getActionApi().getAction(input.getId());
-         switch (updated.getStatus()) {
+      public boolean apply(AtomicReference<Action> input) {
+         checkNotNull(input.get(), "action");
+         Action current = api.getActionApi().getAction(input.get().id());
+         input.set(current);
+         switch (current.status()) {
             case COMPLETED:
                return true;
             case INPROGRESS:
                return false;
             case ERROR:
             default:
-               throw new IllegalStateException("Resource is in invalid status: " + input.getStatus().name());
+               throw new IllegalStateException("Resource is in invalid status: " + input.get().status().name());
          }
       }
 
    }
 
    @VisibleForTesting
-   static class DropletCreatedPredicate implements Predicate<DropletCreate.Action> {
+   static class DropletTerminatedPredicate implements Predicate<Integer> {
 
       private final DigitalOcean2Api api;
 
-      public DropletCreatedPredicate(DigitalOcean2Api api) {
+      public DropletTerminatedPredicate(DigitalOcean2Api api) {
          this.api = checkNotNull(api, "api must not be null");
       }
 
       @Override
-      public boolean apply(DropletCreate.Action input) {
-         Action updated = api.getActionApi().getAction(input.getId());
-         switch (updated.getStatus()) {
-            case COMPLETED:
-               return true;
-            case INPROGRESS:
-               return false;
-            case ERROR:
-            default:
-               throw new IllegalStateException("Resource is in invalid status: " + updated.getStatus().name());
+      public boolean apply(Integer input) {
+         checkNotNull(input, "droplet");
+         Droplet droplet = api.getDropletApi().getDroplet(input);
+         if (droplet == null) {
+            return true;
          }
+         return false;
       }
 
    }
 
    @VisibleForTesting
    static class RegionAvailablePredicate implements Predicate<Region> {
-
-/*
-      private final DigitalOcean2Api api;
-
-      public RegionAvailablePredicate(DigitalOcean2Api api) {
-         this.api = checkNotNull(api, "api must not be null");
-      }
-*/
-
       @Override
       public boolean apply(Region input) {
-         return input.isAvailable();
+         return input.available();
       }
 
    }

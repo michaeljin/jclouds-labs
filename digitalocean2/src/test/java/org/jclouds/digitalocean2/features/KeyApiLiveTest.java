@@ -43,14 +43,14 @@ public class KeyApiLiveTest extends BaseDigitalOcean2LiveTest {
    public void testRetrieveKey() {
 
       Key key = api().getKey(keyId);
-      assertEquals(key.getFingerprint(), fingerprint);
+      assertEquals(key.fingerprint(), fingerprint);
    }
 
    @Test(groups = "live")
    public void testCreate() {
       Key key = api().create("test-key", "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDtUlMVNzUQY7WK8nhweUwmkgHCgsiL/HwHckllWln73UIQ0p1Fw+IkFgX9l5+SLZ5TJXgw4PZ5b5BESifLIiThj6N1zKtOeFQZYuCnajNHsrxyhceLNXGo+wNcqUiwwzUJmF2j16Mbj0imV8JY23L31ez4q92wXUg0JdwNs+DXJBbcT9af0GRQDNkpuwRpiA1A2XfnacxoixPzcBhZKrTC8VmRXZuYfV7u92EHWqBV6YASmybhSOv1NqBuUmsHp2w7Vf7O+5ZX21x2yjJoNTZQqhy4+imMqCbsWW30JimTVl5U+W+RcaIY2PhbxQrPNZsHNIKh1A3U/14OWff2l1hb someone@somewhere.com");
-      keyId = key.getId();
-      fingerprint = key.getFingerprint();
+      keyId = key.id();
+      fingerprint = key.fingerprint();
 
    }
 

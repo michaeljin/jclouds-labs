@@ -136,6 +136,7 @@
                                     <goal>test</goal>
                                 </goals>
                                 <configuration>
+                                    <threadCount>1</threadCount>
                                     <systemPropertyVariables>
                                         <test.digitalocean.endpoint>${test.digitalocean.endpoint}</test.digitalocean.endpoint>
                                         <test.digitalocean.api-version>${test.digitalocean.api-version}</test.digitalocean.api-version>

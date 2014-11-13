@@ -24,6 +24,7 @@ import static org.jclouds.compute.config.ComputeServiceProperties.TIMEOUT_IMAGE_
 import static org.jclouds.compute.config.ComputeServiceProperties.TIMEOUT_NODE_SUSPENDED;
 
 import java.util.NoSuchElementException;
+import java.util.concurrent.atomic.AtomicReference;
 import javax.annotation.Resource;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -43,6 +44,7 @@ import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Predicate;
 import com.google.common.primitives.Ints;
+import com.google.common.util.concurrent.Atomics;
 import com.google.common.util.concurrent.ListenableFuture;
 
 /**
@@ -56,13 +58,13 @@ public class DigitalOceanImageExtension implements ImageExtension {
    protected Logger logger = Logger.NULL;
 
    private final DigitalOcean2Api api;
-   private final Predicate<Action> imageAvailablePredicate;
-   private final Predicate<Action> nodeStoppedPredicate;
+   private final Predicate<AtomicReference<Action>> imageAvailablePredicate;
+   private final Predicate<AtomicReference<Action>> nodeStoppedPredicate;
    private final Function<org.jclouds.digitalocean2.domain.Image, Image> imageTransformer;
 
    @Inject DigitalOceanImageExtension(DigitalOcean2Api api,
-         @Named(TIMEOUT_IMAGE_AVAILABLE) Predicate<Action> imageAvailablePredicate,
-         @Named(TIMEOUT_NODE_SUSPENDED) Predicate<Action> nodeStoppedPredicate,
+         @Named(TIMEOUT_IMAGE_AVAILABLE) Predicate<AtomicReference<Action>> imageAvailablePredicate,
+         @Named(TIMEOUT_NODE_SUSPENDED) Predicate<AtomicReference<Action>> nodeStoppedPredicate,
          Function<org.jclouds.digitalocean2.domain.Image, Image> imageTransformer) {
       this.api = Preconditions.checkNotNull(api, "api cannot be null");
       this.imageAvailablePredicate = checkNotNull(imageAvailablePredicate, "imageAvailablePredicate cannot be null");
@@ -88,7 +90,7 @@ public class DigitalOceanImageExtension implements ImageExtension {
 
       // Droplet needs to be stopped
       Action powerOffEvent = api.getDropletApi().powerOff(Integer.parseInt(cloneTemplate.getSourceNodeId()));
-      nodeStoppedPredicate.apply(powerOffEvent);
+      nodeStoppedPredicate.apply(Atomics.newReference(powerOffEvent));
 
       Action snapshotEvent = api.getDropletApi().snapshot(Integer.parseInt(cloneTemplate.getSourceNodeId()),
             cloneTemplate.getName());
@@ -96,13 +98,13 @@ public class DigitalOceanImageExtension implements ImageExtension {
       logger.info(">> registered new Image, waiting for it to become available");
 
       // Until the process completes we don't have enough information to build an image to return
-      imageAvailablePredicate.apply(snapshotEvent);
+      imageAvailablePredicate.apply(Atomics.newReference(snapshotEvent));
 
-      org.jclouds.digitalocean2.domain.Image snapshot = find(api.getImageApi().listImages(),
+      org.jclouds.digitalocean2.domain.Image snapshot = find(api.getImageApi().listImages(100),
             new Predicate<org.jclouds.digitalocean2.domain.Image>() {
                @Override
                public boolean apply(org.jclouds.digitalocean2.domain.Image input) {
-                  return input.getName().equals(cloneTemplate.getName());
+                  return input.name().equals(cloneTemplate.getName());
                }
             });
 
