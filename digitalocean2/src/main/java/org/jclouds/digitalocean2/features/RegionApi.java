@@ -32,9 +32,9 @@ import org.jclouds.rest.annotations.RequestFilters;
 import org.jclouds.rest.annotations.SelectJson;
 
 /**
- * Provides access to Keys via the REST API.
+ * Provides access to Regions via the REST API.
  *
- * @see <a href="https://developers.digitalocean.com/v2/#keys"/>
+ * @see <a href="https://developers.digitalocean.com/v2/#regions"/>
  * @see org.jclouds.digitalocean2.features.RegionApi
  */
 @Path("/regions")

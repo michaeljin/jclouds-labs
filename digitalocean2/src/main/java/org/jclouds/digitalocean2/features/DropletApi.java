@@ -48,7 +48,7 @@ import org.jclouds.rest.annotations.SelectJson;
 import org.jclouds.rest.binders.BindToJsonPayload;
 
 /**
- * Provides access to Instances via their REST API.
+ * Provides access to Droplets via their REST API.
  *
  * @see <a href="https://developers.digitalocean.com/v2/#droplets"/>
  * @see DropletApi

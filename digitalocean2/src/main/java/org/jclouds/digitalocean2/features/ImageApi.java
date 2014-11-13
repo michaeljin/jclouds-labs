@@ -39,10 +39,10 @@ import org.jclouds.rest.annotations.RequestFilters;
 import org.jclouds.rest.annotations.SelectJson;
 
 /**
- * Provides access to Keys via the REST API.
+ * Provides access to Images via the REST API.
  *
- * @see <a href="https://developers.digitalocean.com/v2/#keys"/>
- * @see org.jclouds.digitalocean2.features.ImageApi
+ * @see <a href="https://developers.digitalocean.com/v2/#images"/>
+ * @see ImageApi
  */
 @Path("/images")
 @RequestFilters(OAuthAuthenticationFilter.class)

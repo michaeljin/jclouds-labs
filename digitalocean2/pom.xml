@@ -26,18 +26,17 @@
         <version>2.0.0-SNAPSHOT</version>
     </parent>
 
-    <!-- TODO: when out of labs, switch to org.jclouds.provider -->
     <groupId>org.apache.jclouds.labs</groupId>
     <artifactId>digitalocean2</artifactId>
     <name>jclouds DigitalOcean v2 API Provider</name>
     <description>jclouds provider for Digital Ocean v2 Compute API</description>
 
     <properties>
-        <test.digitalocean.endpoint>https://api.digitalocean.com/v2/</test.digitalocean.endpoint>
-        <test.digitalocean.api-version>2</test.digitalocean.api-version>
-        <test.digitalocean.identity>FIXME</test.digitalocean.identity>
-        <test.digitalocean.credential>FIXME</test.digitalocean.credential>
-        <test.digitalocean.template>imageId=ubuntu-14-04-x64</test.digitalocean.template>
+        <test.digitalocean2.endpoint>https://api.digitalocean.com/v2/</test.digitalocean2.endpoint>
+        <test.digitalocean2.api-version>2</test.digitalocean2.api-version>
+        <test.digitalocean2.identity>FIXME</test.digitalocean2.identity>
+        <test.digitalocean2.credential>FIXME</test.digitalocean2.credential>
+        <test.digitalocean2.template>imageId=ubuntu-14-04-x64</test.digitalocean2.template>
     </properties>
 
     <dependencies>
@@ -138,11 +137,12 @@
                                 <configuration>
                                     <threadCount>1</threadCount>
                                     <systemPropertyVariables>
-                                        <test.digitalocean.endpoint>${test.digitalocean.endpoint}</test.digitalocean.endpoint>
-                                        <test.digitalocean.api-version>${test.digitalocean.api-version}</test.digitalocean.api-version>
-                                        <test.digitalocean.build-version>${test.digitalocean.build-version}</test.digitalocean.build-version>
-                                        <test.digitalocean.credential>${test.digitalocean.credential}</test.digitalocean.credential>
-                                        <test.digitalocean.template>${test.digitalocean.template}</test.digitalocean.template>
+                                        <test.digitalocean2.endpoint>${test.digitalocean2.endpoint}</test.digitalocean2.endpoint>
+                                        <test.digitalocean2.api-version>${test.digitalocean2.api-version}</test.digitalocean2.api-version>
+                                        <test.digitalocean2.build-version>${test.digitalocean2.build-version}</test.digitalocean2.build-version>
+                                        <test.digitalocean2.identity>${test.digitalocean2.identity}</test.digitalocean2.identity>
+                                        <test.digitalocean2.credential>${test.digitalocean2.credential}</test.digitalocean2.credential>
+                                        <test.digitalocean2.template>${test.digitalocean2.template}</test.digitalocean2.template>
                                     </systemPropertyVariables>
                                 </configuration>
                             </execution>

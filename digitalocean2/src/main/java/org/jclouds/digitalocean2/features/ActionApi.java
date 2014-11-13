@@ -36,10 +36,10 @@ import org.jclouds.rest.annotations.RequestFilters;
 import org.jclouds.rest.annotations.SelectJson;
 
 /**
- * Provides access to Keys via the REST API.
+ * Provides access to Actions via the REST API.
  *
- * @see <a href="https://developers.digitalocean.com/v2/#keys"/>
- * @see org.jclouds.digitalocean2.features.ActionApi
+ * @see <a href="https://developers.digitalocean.com/v2/#actions"/>
+ * @see ActionApi
  */
 @Path("/actions")
 @RequestFilters(OAuthAuthenticationFilter.class)
