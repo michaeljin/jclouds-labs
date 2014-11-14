@@ -55,7 +55,7 @@ public class ListSshKeys {
    }
 
    public List<Key> execute() {
-      List<Key> keys = keyPairApi.listKeys();
+      List<Key> keys = keyPairApi.listKeys(1000);
 
       ListenableFuture<List<Key>> futures = allAsList(transform(keys,
             new Function<Key, ListenableFuture<Key>>() {

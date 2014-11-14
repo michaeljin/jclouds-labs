@@ -35,7 +35,7 @@ public class KeyApiLiveTest extends BaseDigitalOcean2LiveTest {
    @Test(groups = "live", dependsOnMethods = "testRetrieveKey")
    public void testListKeys() {
 
-      List<Key> keys = api().listKeys();
+      List<Key> keys = api().listKeys(1000);
       assertEquals(keys.size(), 2);
    }
 

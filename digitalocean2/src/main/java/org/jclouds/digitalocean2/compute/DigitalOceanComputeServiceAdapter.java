@@ -112,7 +112,7 @@ public class DigitalOceanComputeServiceAdapter implements ComputeServiceAdapter<
 
    @Override
    public Iterable<Image> listImages() {
-      return api.getImageApi().listImages(100);
+      return api.getImageApi().listImages(1000);
    }
 
    @Override
@@ -133,7 +133,7 @@ public class DigitalOceanComputeServiceAdapter implements ComputeServiceAdapter<
 
    @Override
    public Iterable<Droplet> listNodes() {
-      return api.getDropletApi().listDroplets();
+      return api.getDropletApi().listDroplets(1000);
    }
 
    @Override

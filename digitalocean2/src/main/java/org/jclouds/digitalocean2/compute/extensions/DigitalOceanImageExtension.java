@@ -100,7 +100,7 @@ public class DigitalOceanImageExtension implements ImageExtension {
       // Until the process completes we don't have enough information to build an image to return
       imageAvailablePredicate.apply(Atomics.newReference(snapshotEvent));
 
-      org.jclouds.digitalocean2.domain.Image snapshot = find(api.getImageApi().listImages(100),
+      org.jclouds.digitalocean2.domain.Image snapshot = find(api.getImageApi().listImages(1000),
             new Predicate<org.jclouds.digitalocean2.domain.Image>() {
                @Override
                public boolean apply(org.jclouds.digitalocean2.domain.Image input) {
