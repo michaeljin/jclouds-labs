@@ -53,7 +53,7 @@ public interface ImageApi extends Closeable {
    @GET
    @SelectJson("images")
    @Fallback(EmptySetOnNotFoundOr404.class)
-   Set<Image> listImages(@Nullable @DefaultValue("100") @QueryParam("per_page") int perPage);
+   Set<Image> listImages(@QueryParam("per_page") int perPage);
 
    @Named("image:get")
    @GET

@@ -28,6 +28,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
 import org.jclouds.Fallbacks.EmptyIterableWithMarkerOnNotFoundOr404;
@@ -64,6 +65,12 @@ public interface DropletApi extends Closeable {
    @SelectJson("droplets")
    @Fallback(EmptyIterableWithMarkerOnNotFoundOr404.class)
    Set<Droplet> listDroplets();
+
+   @Named("droplet:list")
+   @GET
+   @SelectJson("droplets")
+   @Fallback(EmptyIterableWithMarkerOnNotFoundOr404.class)
+   Set<Droplet> listDroplets(@QueryParam("per_page") int perPage);
 
    @Named("droplet:listkernels")
    @GET

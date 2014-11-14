@@ -128,7 +128,7 @@ public class CreateKeyPairsThenCreateNodes extends CreateNodesWithGroupEncodedIn
       logger.debug(">> checking if the key pair already exists...");
 
       PublicKey userKey = sshKeyToPublicKey.apply(options.getPublicKey());
-      Optional<Key> key = tryFind(api.getKeyApi().listKeys(), new SameFingerprint(userKey));
+      Optional<Key> key = tryFind(api.getKeyApi().listKeys(1000), new SameFingerprint(userKey));
 
       if (!key.isPresent()) {
          logger.debug(">> key pair not found. creating a new one...");

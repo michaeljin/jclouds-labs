@@ -28,6 +28,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
 import org.jclouds.Fallbacks.EmptyIterableWithMarkerOnNotFoundOr404;
@@ -57,6 +58,12 @@ public interface KeyApi extends Closeable {
    @SelectJson("ssh_keys")
    @Fallback(EmptyIterableWithMarkerOnNotFoundOr404.class)
    List<Key> listKeys();
+
+   @Named("key:list")
+   @GET
+   @SelectJson("ssh_keys")
+   @Fallback(EmptyIterableWithMarkerOnNotFoundOr404.class)
+   List<Key> listKeys(@QueryParam("per_page") int perPage);
 
    @Named("key:create")
    @POST
