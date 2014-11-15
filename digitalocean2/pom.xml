@@ -27,7 +27,7 @@
     </parent>
 
     <groupId>org.apache.jclouds.labs</groupId>
-    <artifactId>digitalocean2</artifactId>
+    <artifactId>digitalocean2-mesosphere</artifactId>
     <name>jclouds DigitalOcean v2 API Provider</name>
     <description>jclouds provider for Digital Ocean v2 Compute API</description>
 
@@ -53,7 +53,7 @@
         </dependency>
         <dependency>
             <groupId>org.apache.jclouds.labs</groupId>
-            <artifactId>oauth</artifactId>
+            <artifactId>oauth-mesosphere</artifactId>
             <version>${project.version}</version>
             <type>test-jar</type>
             <scope>test</scope>
