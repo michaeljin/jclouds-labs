@@ -17,11 +17,13 @@
 package org.jclouds.digitalocean2.features;
 
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotNull;
 
 import java.util.List;
 
 import org.jclouds.digitalocean2.domain.Key;
 import org.jclouds.digitalocean2.internal.BaseDigitalOcean2LiveTest;
+import org.testng.annotations.AfterTest;
 import org.testng.annotations.Test;
 
 public class KeyApiLiveTest extends BaseDigitalOcean2LiveTest {
@@ -31,32 +33,33 @@ public class KeyApiLiveTest extends BaseDigitalOcean2LiveTest {
    }
    private int keyId;
    private String fingerprint;
+   private Key newKey;
+
 
    @Test(groups = "live", dependsOnMethods = "testRetrieveKey")
    public void testListKeys() {
-
       List<Key> keys = api().listKeys(1000);
-      assertEquals(keys.size(), 2);
+      assertEquals(keys.contains(newKey), true, "New key must be in list");
    }
 
    @Test(groups = "live", dependsOnMethods = "testCreate")
    public void testRetrieveKey() {
-
       Key key = api().getKey(keyId);
-      assertEquals(key.fingerprint(), fingerprint);
+      assertEquals(key.fingerprint(), newKey.fingerprint());
    }
 
    @Test(groups = "live")
    public void testCreate() {
-      Key key = api().create("test-key", "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDtUlMVNzUQY7WK8nhweUwmkgHCgsiL/HwHckllWln73UIQ0p1Fw+IkFgX9l5+SLZ5TJXgw4PZ5b5BESifLIiThj6N1zKtOeFQZYuCnajNHsrxyhceLNXGo+wNcqUiwwzUJmF2j16Mbj0imV8JY23L31ez4q92wXUg0JdwNs+DXJBbcT9af0GRQDNkpuwRpiA1A2XfnacxoixPzcBhZKrTC8VmRXZuYfV7u92EHWqBV6YASmybhSOv1NqBuUmsHp2w7Vf7O+5ZX21x2yjJoNTZQqhy4+imMqCbsWW30JimTVl5U+W+RcaIY2PhbxQrPNZsHNIKh1A3U/14OWff2l1hb someone@somewhere.com");
-      keyId = key.id();
-      fingerprint = key.fingerprint();
+      newKey = api().create("test-key",
+            "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDtUlMVNzUQY7WK8nhweUwmkgHCgsiL/HwHckllWln73UIQ0p1Fw+IkFgX9l5+SLZ5TJXgw4PZ5b5BESifLIiThj6N1zKtOeFQZYuCnajNHsrxyhceLNXGo+wNcqUiwwzUJmF2j16Mbj0imV8JY23L31ez4q92wXUg0JdwNs+DXJBbcT9af0GRQDNkpuwRpiA1A2XfnacxoixPzcBhZKrTC8VmRXZuYfV7u92EHWqBV6YASmybhSOv1NqBuUmsHp2w7Vf7O+5ZX21x2yjJoNTZQqhy4+imMqCbsWW30JimTVl5U+W+RcaIY2PhbxQrPNZsHNIKh1A3U/14OWff2l1hb someone@somewhere.com");
+      keyId = newKey.id();
 
    }
-
-   @Test(groups = "live", dependsOnMethods = "testListKeys")
+   @Test(groups = "live", dependsOnMethods = "testListKeys", alwaysRun = true)
    public void testDeleteKey() {
       api().deleteKey(keyId);
+      List<Key> keys = api().listKeys(1000);
+      assertEquals(keys.contains(newKey), false, "New key must not be present in list");
 
    }
 
