@@ -31,6 +31,7 @@ import java.security.PublicKey;
 import java.security.interfaces.DSAPublicKey;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.DSAPublicKeySpec;
+import java.security.spec.ECPublicKeySpec;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.RSAPublicKeySpec;
 import java.util.Map;
@@ -38,6 +39,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import org.jclouds.digitalocean2.ssh.DSAKeys;
+import org.jclouds.digitalocean2.ssh.ECDSAKeys;
 import org.jclouds.json.config.GsonModule.DateAdapter;
 import org.jclouds.json.config.GsonModule.Iso8601DateAdapter;
 import org.jclouds.ssh.SshKeys;
@@ -121,11 +123,11 @@ public class DigitalOceanParserModule extends AbstractModule {
                } else if ("ssh-dss".equals(type)) {
                   DSAPublicKeySpec spec = DSAKeys.publicKeySpecFromOpenSSH(input);
                   return KeyFactory.getInstance("DSA").generatePublic(spec);
+               } else if (type.startsWith("ecdsa-sha2-")) {
+                  ECPublicKeySpec spec = ECDSAKeys.publicKeySpecFromOpenSSH(input);
+                  return KeyFactory.getInstance("EC").generatePublic(spec);
                } else {
-                  // DO supports more SSH key formats than jclouds -- for now eat the error because we don't do
-                  // anything with these keys
-                  //throw new IllegalArgumentException("bad format, should be: [ssh-rsa|ssh-dss] AAAAB3...");
-                  return getNullKey();
+                  throw new IllegalArgumentException("bad format, jclouds supports ssh-rsa, ssh-dss, ecdsa-sha2-nistp[256|384|521]");
                }
             } catch (InvalidKeySpecException ex) {
                throw propagate(ex);
