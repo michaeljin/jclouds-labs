@@ -123,7 +123,7 @@ public class CreateKeyPairsThenCreateNodes extends CreateNodesWithGroupEncodedIn
       return responses;
    }
 
-   private void createKeyPairForPublicKeyInOptionsAndAddToSet(DigitalOceanTemplateOptions options,
+   private synchronized void createKeyPairForPublicKeyInOptionsAndAddToSet(DigitalOceanTemplateOptions options,
          Set<Integer> generatedSshKeyIds) {
       logger.debug(">> checking if the key pair already exists...");
 
