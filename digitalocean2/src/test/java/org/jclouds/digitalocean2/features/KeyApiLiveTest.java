@@ -17,13 +17,11 @@
 package org.jclouds.digitalocean2.features;
 
 import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNotNull;
 
 import java.util.List;
 
 import org.jclouds.digitalocean2.domain.Key;
 import org.jclouds.digitalocean2.internal.BaseDigitalOcean2LiveTest;
-import org.testng.annotations.AfterTest;
 import org.testng.annotations.Test;
 
 public class KeyApiLiveTest extends BaseDigitalOcean2LiveTest {

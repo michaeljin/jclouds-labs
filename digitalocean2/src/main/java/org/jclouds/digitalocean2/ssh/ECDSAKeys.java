@@ -31,10 +31,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
-import java.security.interfaces.DSAParams;
-import java.security.interfaces.DSAPublicKey;
 import java.security.interfaces.ECPublicKey;
-import java.security.spec.DSAPublicKeySpec;
 import java.security.spec.ECFieldFp;
 import java.security.spec.ECParameterSpec;
 import java.security.spec.ECPoint;
@@ -123,14 +120,14 @@ public class ECDSAKeys {
       checkArgument(size(parts) >= 2 && signatureFormat.startsWith(ECDSA_SHA2_PREFIX), "bad format, should be: ecdsa-sha2-xxx AAAAB3...");
 
       String curveName = signatureFormat.substring(ECDSA_SHA2_PREFIX.length());
-      if (CURVES.containsKey(curveName) == false) {
+      if (!CURVES.containsKey(curveName)) {
          throw new IOException("Unsupported curve: " + curveName);
       }
       ECParameterSpec spec = CURVES.get(curveName);
       stream = new ByteArrayInputStream(base64().decode(get(parts, 1)));
       String keyType = new String(readLengthFirst(stream));
       String curveMarker = new String(readLengthFirst(stream));
-      checkArgument((curveName).equals(curveMarker), "looking for marker %s but got %s", curveName, curveMarker);
+      checkArgument(curveName.equals(curveMarker), "looking for marker %s but got %s", curveName, curveMarker);
 
       ECPoint ecPoint = decodeECPoint(readLengthFirst(stream), spec.getCurve());
 
