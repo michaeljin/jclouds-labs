@@ -31,7 +31,7 @@ import com.google.common.base.Optional;
 @AutoValue
 public abstract class Action {
    public enum Status {
-      COMPLETED, INPROGRESS("in-progress"), ERROR;
+      COMPLETED, INPROGRESS("in-progress"), ERRORED;
 
       Status(final String displayName) {
          try {
