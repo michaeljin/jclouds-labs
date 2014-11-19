@@ -169,7 +169,7 @@ public class DigitalOceanComputeServiceContextModule extends
                return true;
             case INPROGRESS:
                return false;
-            case ERROR:
+            case ERRORED:
             default:
                throw new IllegalStateException("Resource is in invalid status: " + input.get().status().name());
          }
