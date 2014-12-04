@@ -30,7 +30,7 @@ import javax.ws.rs.core.MediaType;
 import org.jclouds.Fallbacks.EmptyIterableWithMarkerOnNotFoundOr404;
 import org.jclouds.digitalocean2.domain.Action;
 import org.jclouds.javax.annotation.Nullable;
-import org.jclouds.oauth.v2.filters.OAuthAuthenticationFilter;
+import org.jclouds.oauth.v2.filters.OAuthFilter;
 import org.jclouds.rest.annotations.Fallback;
 import org.jclouds.rest.annotations.RequestFilters;
 import org.jclouds.rest.annotations.SelectJson;
@@ -42,7 +42,7 @@ import org.jclouds.rest.annotations.SelectJson;
  * @see ActionApi
  */
 @Path("/actions")
-@RequestFilters(OAuthAuthenticationFilter.class)
+@RequestFilters(OAuthFilter.class)
 @Consumes(MediaType.APPLICATION_JSON)
 public interface ActionApi extends Closeable {
 
