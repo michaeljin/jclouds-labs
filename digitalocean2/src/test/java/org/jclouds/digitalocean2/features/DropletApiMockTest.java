@@ -35,7 +35,6 @@ import org.jclouds.digitalocean2.domain.Network;
 import org.jclouds.digitalocean2.domain.options.CreateDropletOptions;
 import org.jclouds.http.BaseMockWebServerTest;
 import org.jclouds.http.config.JavaUrlHttpCommandExecutorServiceModule;
-import org.jclouds.oauth.v2.OAuthTestUtils;
 import org.testng.annotations.Test;
 import com.google.common.base.Charsets;
 import com.google.common.base.Function;
@@ -135,7 +134,6 @@ public class DropletApiMockTest extends BaseMockWebServerTest {
 
    @Override
    protected void addOverrideProperties(Properties props) {
-      OAuthTestUtils.bearerTokenAuthProperties(props);
       props.setProperty(PROPERTY_MAX_RETRIES, "1");
       props.setProperty("digitalocean2.identity", "doesn't matter");
       props.setProperty("digitalocean2.credential", "c5401990f0c24135e8d6b5d260603fc71696d4738da9aa04a720229a01a2521d");
