@@ -49,7 +49,7 @@ public abstract class Droplet {
    public abstract int disk();
    @Nullable public abstract Region region();
    @Nullable public abstract Image image();
-   public abstract Kernel kernel();
+   @Nullable public abstract Kernel kernel();
    public abstract String size();
    public abstract boolean locked();
    public abstract String created();
