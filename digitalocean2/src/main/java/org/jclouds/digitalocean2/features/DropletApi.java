@@ -39,7 +39,7 @@ import org.jclouds.digitalocean2.domain.DropletCreate;
 import org.jclouds.digitalocean2.domain.Kernel;
 import org.jclouds.digitalocean2.domain.Snapshot;
 import org.jclouds.digitalocean2.domain.options.CreateDropletOptions;
-import org.jclouds.oauth.v2.filters.OAuthAuthenticationFilter;
+import org.jclouds.oauth.v2.filters.OAuthFilter;
 import org.jclouds.rest.annotations.Fallback;
 import org.jclouds.rest.annotations.MapBinder;
 import org.jclouds.rest.annotations.Payload;
@@ -55,7 +55,7 @@ import org.jclouds.rest.binders.BindToJsonPayload;
  * @see DropletApi
  */
 @Path("/droplets")
-@RequestFilters(OAuthAuthenticationFilter.class)
+@RequestFilters(OAuthFilter.class)
 @Consumes(MediaType.APPLICATION_JSON)
 public interface DropletApi extends Closeable {
 

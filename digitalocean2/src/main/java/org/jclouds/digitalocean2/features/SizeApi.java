@@ -26,7 +26,7 @@ import javax.ws.rs.core.MediaType;
 
 import org.jclouds.Fallbacks.EmptyIterableWithMarkerOnNotFoundOr404;
 import org.jclouds.digitalocean2.domain.Size;
-import org.jclouds.oauth.v2.filters.OAuthAuthenticationFilter;
+import org.jclouds.oauth.v2.filters.OAuthFilter;
 import org.jclouds.rest.annotations.Fallback;
 import org.jclouds.rest.annotations.RequestFilters;
 import org.jclouds.rest.annotations.SelectJson;
@@ -38,7 +38,7 @@ import org.jclouds.rest.annotations.SelectJson;
  * @see org.jclouds.digitalocean2.features.SizeApi
  */
 @Path("/sizes")
-@RequestFilters(OAuthAuthenticationFilter.class)
+@RequestFilters(OAuthFilter.class)
 @Consumes(MediaType.APPLICATION_JSON)
 public interface SizeApi extends Closeable {
 

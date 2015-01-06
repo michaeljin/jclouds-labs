@@ -17,6 +17,8 @@
 package org.jclouds.digitalocean2;
 
 import static org.jclouds.Constants.PROPERTY_SESSION_INTERVAL;
+import static org.jclouds.compute.config.ComputeServiceProperties.POLL_INITIAL_PERIOD;
+import static org.jclouds.compute.config.ComputeServiceProperties.POLL_MAX_PERIOD;
 import static org.jclouds.compute.config.ComputeServiceProperties.TEMPLATE;
 import static org.jclouds.digitalocean2.DigitalOcean2Constants.DIGITALOCEANV2_PROVIDER_NAME;
 import static org.jclouds.oauth.v2.config.CredentialType.BEARER_TOKEN_CREDENTIALS;
@@ -33,7 +35,6 @@ import org.jclouds.compute.ComputeServiceContext;
 import org.jclouds.digitalocean2.compute.config.DigitalOceanComputeServiceContextModule;
 import org.jclouds.digitalocean2.config.DigitalOcean2HttpApiModule;
 import org.jclouds.digitalocean2.config.DigitalOceanParserModule;
-import org.jclouds.oauth.v2.config.OAuthAuthenticationModule;
 import org.jclouds.oauth.v2.config.OAuthModule;
 import org.jclouds.rest.internal.BaseHttpApiMetadata;
 import com.google.auto.service.AutoService;
@@ -66,6 +67,8 @@ public class DigitalOcean2ApiMetadata extends BaseHttpApiMetadata<DigitalOcean2A
       properties.put(AUDIENCE, "https://cloud.digitalocean.com/v1/oauth/token");
       properties.put(PROPERTY_SESSION_INTERVAL, 3600);
       properties.put(TEMPLATE, "osFamily=UBUNTU,osVersionMatches=1[24]\\.04.*");
+      properties.put(POLL_INITIAL_PERIOD, 5000);
+      properties.put(POLL_MAX_PERIOD, 20000);
       properties.put(CREDENTIAL_TYPE, BEARER_TOKEN_CREDENTIALS.toString());
       return properties;
    }
@@ -83,7 +86,6 @@ public class DigitalOcean2ApiMetadata extends BaseHttpApiMetadata<DigitalOcean2A
                  .view(typeToken(ComputeServiceContext.class))
                  .defaultModules(ImmutableSet.<Class<? extends Module>>builder()
                        .add(DigitalOcean2HttpApiModule.class)
-                       .add(OAuthAuthenticationModule.class)
                        .add(OAuthModule.class)
                        .add(DigitalOceanParserModule.class)
                        .add(DigitalOceanComputeServiceContextModule.class)

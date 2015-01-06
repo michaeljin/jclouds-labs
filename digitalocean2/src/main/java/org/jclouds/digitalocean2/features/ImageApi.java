@@ -31,7 +31,7 @@ import javax.ws.rs.core.MediaType;
 
 import org.jclouds.Fallbacks.EmptySetOnNotFoundOr404;
 import org.jclouds.digitalocean2.domain.Image;
-import org.jclouds.oauth.v2.filters.OAuthAuthenticationFilter;
+import org.jclouds.oauth.v2.filters.OAuthFilter;
 import org.jclouds.rest.annotations.Fallback;
 import org.jclouds.rest.annotations.RequestFilters;
 import org.jclouds.rest.annotations.SelectJson;
@@ -43,7 +43,7 @@ import org.jclouds.rest.annotations.SelectJson;
  * @see ImageApi
  */
 @Path("/images")
-@RequestFilters(OAuthAuthenticationFilter.class)
+@RequestFilters(OAuthFilter.class)
 @Consumes(MediaType.APPLICATION_JSON)
 public interface ImageApi extends Closeable {
 
