@@ -16,6 +16,7 @@
  */
 package org.jclouds.digitalocean2.domain;
 
+import org.jclouds.javax.annotation.Nullable;
 import org.jclouds.json.SerializedNames;
 import com.google.auto.value.AutoValue;
 
@@ -23,7 +24,7 @@ import com.google.auto.value.AutoValue;
 public abstract class Kernel {
    public abstract int id();
    public abstract String name();
-   public abstract String version();
+   @Nullable public abstract String version();
 
    @SerializedNames({ "id", "name", "version" })
    public static Kernel create(int id, String name, String version) {
