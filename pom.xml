@@ -107,6 +107,7 @@
             <exclude>**/src/test/resources/**/*.xml</exclude>
             <exclude>**/src/test/resources/**/*.html</exclude>
             <exclude>**/src/test/resources/**/*.iso</exclude>
+            <exclude>**/src/test/resources/**/ssh*.pub</exclude>            
             
             <!-- prevent duplicating license -->
             <exclude>**/LICENSE.txt</exclude>

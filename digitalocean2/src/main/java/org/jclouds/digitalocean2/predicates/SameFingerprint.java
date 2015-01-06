@@ -20,10 +20,12 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.security.PublicKey;
 import java.security.interfaces.DSAPublicKey;
+import java.security.interfaces.ECPublicKey;
 import java.security.interfaces.RSAPublicKey;
 
 import org.jclouds.digitalocean2.domain.Key;
 import org.jclouds.digitalocean2.ssh.DSAKeys;
+import org.jclouds.digitalocean2.ssh.ECDSAKeys;
 import org.jclouds.ssh.SshKeys;
 import com.google.common.base.Predicate;
 
@@ -53,6 +55,9 @@ public class SameFingerprint implements Predicate<Key> {
          DSAPublicKey dsaKey = (DSAPublicKey) key;
          return DSAKeys.fingerprint(dsaKey.getParams().getP(), dsaKey.getParams().getQ(), dsaKey.getParams().getG(),
                dsaKey.getY());
+      } else if (key instanceof ECPublicKey) {
+         ECPublicKey ecdsaKey = (ECPublicKey) key;
+         return ECDSAKeys.fingerprint(ecdsaKey);
       } else {
          throw new IllegalArgumentException("Only RSA and DSA keys are supported");
       }
