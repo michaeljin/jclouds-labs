@@ -25,6 +25,7 @@ import org.jclouds.http.HttpErrorHandler;
 import org.jclouds.http.HttpResponse;
 import org.jclouds.http.HttpResponseException;
 import org.jclouds.rest.AuthorizationException;
+import org.jclouds.rest.InsufficientResourcesException;
 import org.jclouds.rest.ResourceNotFoundException;
 
 /**
@@ -46,7 +47,11 @@ public class DigitalOceanErrorHandler implements HttpErrorHandler {
             break;
          case 401:
          case 403:
-            exception = new AuthorizationException(message, exception);
+            if (message.indexOf("droplet limit") != -1) {
+               exception = new InsufficientResourcesException(message, exception);
+            } else {
+               exception = new AuthorizationException(message, exception);
+            }
             break;
          case 404:
             if (!command.getCurrentRequest().getMethod().equals("DELETE")) {

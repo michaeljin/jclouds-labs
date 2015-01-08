@@ -18,6 +18,7 @@
 package org.jclouds.digitalocean2.domain;
 
 import java.beans.ConstructorProperties;
+import java.util.Arrays;
 
 import com.google.common.base.Optional;
 
@@ -71,7 +72,7 @@ public class Snapshot {
             ", distribution='" + distribution + '\'' +
             ", slug=" + slug +
             ", ispublic=" + ispublic +
-            ", regions=" + regions +
+            ", regions=" + Arrays.toString(regions) +
             '}';
    }
 }

@@ -31,12 +31,15 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
+import java.security.KeyFactory;
+import java.security.NoSuchAlgorithmException;
 import java.security.interfaces.ECPublicKey;
 import java.security.spec.ECFieldFp;
 import java.security.spec.ECParameterSpec;
 import java.security.spec.ECPoint;
 import java.security.spec.ECPublicKeySpec;
 import java.security.spec.EllipticCurve;
+import java.security.spec.InvalidKeySpecException;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -87,7 +90,8 @@ public class ECDSAKeys {
 
       String keyFormat = ECDSA_SHA2_PREFIX + curveName;
 
-      return keyFormat + " " + curveName + base64().encode(encodeECPoint(key.getW(), key.getParams().getCurve()));
+      byte[] keyBlob = keyBlob(key);
+      return keyFormat + " " + base64().encode(keyBlob);
    }
 
    /**
@@ -138,9 +142,18 @@ public class ECDSAKeys {
     * @param publicKeyOpenSSH RSA public key in OpenSSH format
     * @return fingerprint ex. {@code 2b:a9:62:95:5b:8b:1d:61:e0:92:f7:03:10:e9:db:d9}
     */
-   public static String fingerprintPublicKey(String publicKeyOpenSSH) {
+   public static String fingerprintPublicKey(String publicKeyOpenSSH) throws IOException {
       ECPublicKeySpec publicKeySpec = publicKeySpecFromOpenSSH(publicKeyOpenSSH);
-      return fingerprint(ECDSA_SHA2_PREFIX + "-" + publicKeySpec.getParams().getCurve().toString(), publicKeySpec.getW()); //TODO: not done
+      String fingerprint = null;
+      try {
+         ECPublicKey pk = (ECPublicKey) KeyFactory.getInstance("EC").generatePublic(publicKeySpec);
+         fingerprint = fingerprint(pk);
+      } catch (InvalidKeySpecException e) {
+         e.printStackTrace();
+      } catch (NoSuchAlgorithmException e) {
+         e.printStackTrace();
+      }
+      return fingerprint;
    }
 
    /**
@@ -149,8 +162,8 @@ public class ECDSAKeys {
     * 
     * @return hex fingerprint ex. {@code 2b:a9:62:95:5b:8b:1d:61:e0:92:f7:03:10:e9:db:d9}
     */
-   public static String fingerprint(String m, ECPoint w) {
-      byte[] keyBlob = keyBlob(m, w);
+   public static String fingerprint(ECPublicKey publicKey) {
+      byte[] keyBlob = keyBlob(publicKey);
       return hexColonDelimited(Hashing.md5().hashBytes(keyBlob));
    }
 
@@ -161,15 +174,13 @@ public class ECDSAKeys {
       return on(':').join(fixedLength(2).split(base16().lowerCase().encode(hc.asBytes())));
    }
 
-   /**
-    * @see org.jclouds.ssh.SshKeys
-    */
-   private static byte[] keyBlob(String m, ECPoint w) {
+   private static byte[] keyBlob(ECPublicKey key) {
       try {
+         String curveName = getCurveName(key.getParams());
          ByteArrayOutputStream out = new ByteArrayOutputStream();
-         writeLengthFirst(m.getBytes(), out);
-         writeLengthFirst(w.getAffineX().toByteArray(), out);
-         writeLengthFirst(w.getAffineY().toByteArray(), out);
+         writeLengthFirst((ECDSA_SHA2_PREFIX + curveName).getBytes(), out);
+         writeLengthFirst(curveName.getBytes(), out);
+         writeLengthFirst(encodeECPoint(key.getW(), key.getParams().getCurve()), out);
          return out.toByteArray();
       } catch (IOException e) {
          throw propagate(e);
@@ -321,9 +332,11 @@ public class ECDSAKeys {
             new EllipticCurve(
                   new ECFieldFp(new BigInteger("01FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF", 16)),
                   new BigInteger("01FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFC", 16),
-                  new BigInteger("0051953EB9618E1C9A1F929A21A0B68540EEA2DA725B99B315F3B8B489918EF109E156193951EC7E937B1652C0BD3BB1BF073573DF883D2C34F1EF451FD46B503F00", 16)),
+                  new BigInteger("0051953EB9618E1C9A1F929A21A0B68540EEA2DA725B99B315F3B8B489918EF109E156193951EC7E937B1652C0BD3BB1BF073573DF883D2C34F1EF451FD46B503F00", 16)
+            ),
             new ECPoint(new BigInteger("00C6858E06B70404E9CD9E3ECB662395B4429C648139053FB521F828AF606B4D3DBAA14B5E77EFE75928FE1DC127A2FFA8DE3348B3C1856A429BF97E7E31C2E5BD66", 16),
-                  new BigInteger("011839296A789A3BC0045C8A5FB42C7D1BD998F54449579B446817AFBD17273E662C97EE72995EF42640C550B9013FAD0761353C7086A272C24088BE94769FD16650", 16)),
+                  new BigInteger("011839296A789A3BC0045C8A5FB42C7D1BD998F54449579B446817AFBD17273E662C97EE72995EF42640C550B9013FAD0761353C7086A272C24088BE94769FD16650", 16)
+            ),
             new BigInteger("01FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFA51868783BF2F966B7FCC0148F709A5D03BB5C9B8899C47AEBB6FB71E91386409", 16),
             1);
    }
