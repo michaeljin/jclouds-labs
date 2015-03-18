@@ -61,14 +61,15 @@ public abstract class Action {
    @Nullable public abstract String completed_at();
    @Nullable public abstract int resource_id();
    @Nullable public abstract String resource_type();
-   @Nullable public abstract String region();
+   @Nullable public abstract Region region();
+   @Nullable public abstract String region_slug();
 
    @SerializedNames({ "id", "rel", "href", "status", "type", "started_at", "completed_at", "resource_id",
-         "resource_type", "region" })
+         "resource_type", "region", "region_slug" })
    public static Action create(int id, String rel, String href, Status status, String type, String started_at, String completed_at, int resource_id,
-         String resource_type, String region) {
+         String resource_type, Region region, String region_slug) {
       return new AutoValue_Action(id, rel, href, status, type, started_at, completed_at, resource_id,
-      resource_type, region);
+      resource_type, region, region_slug);
    }
 
    Action() {}
