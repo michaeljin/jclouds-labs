@@ -27,7 +27,7 @@ import com.google.auto.value.AutoValue;
 public abstract class Image {
 
    public abstract int id();
-   public abstract String name();
+   @Nullable public abstract String name();
    public abstract String distribution();
    @Nullable public abstract String slug();
    @Named("public")
