@@ -39,23 +39,23 @@ public class ImageToImage implements Function<Image, org.jclouds.compute.domain.
       // Private images don't have a slug
       builder.id(String.valueOf(input.id()));
       builder.providerId(String.valueOf(input.id()));
-      builder.name(input.name());
-      builder.description(input.name());
+      builder.name(String.valueOf(input.name()));
+      builder.description(String.valueOf(input.name()));
       builder.status(Status.AVAILABLE);
 
       OperatingSystem os;
 
-      if (input.name() != null && input.distribution() != null) {
-         os = OperatingSystem.builder().from(input.name(), input.distribution()).build();
+      if (input.distribution() != null) {
+         os = OperatingSystem.builder().from(String.valueOf(input.name()), input.distribution()).build();
       } else {
          os = null;
       }
 
 
       builder.operatingSystem(builder()
-            .name(input.name())
-            .family(os.getDistribution().getOsFamily()) 
-            .description(input.name())
+            .name(String.valueOf(input.name()))
+            .family(os.getDistribution().getOsFamily())
+            .description(String.valueOf(input.name()))
             .arch(os.getArch()) 
             .version(os.getVersion()) 
             .is64Bit(os.is64bit()) 
